@@ -1,6 +1,7 @@
 import { createElement } from '../render.js';
 import timeFormat from '../consts.js';
 import dayjs from 'dayjs';
+import { makeFirstUppercase } from '../utils.js';
 
 function createRouteOffersTemplate(data) {
   let resultTemplate = '';
@@ -24,7 +25,7 @@ function createRouteTemplate(data) {
   const dataTo = dayjs(data.dateTo);
   const dataCalculate = dataTo.subtract(dataFrom.hour(), 'hours').subtract(dataFrom.minute(), 'minutes');
   const dataDayColumn = dayjs(data.dateFrom).format('MMM DD').toUpperCase();
-  const eventTitle = `${data.type.charAt(0).toUpperCase() + data.type.slice(1)} ${data.name.charAt(0).toUpperCase() + data.name.slice(1)}`;
+  const eventTitle = `${makeFirstUppercase(data.type)} ${makeFirstUppercase(data.name)}`;
 
   return `
   <li class="trip-events__item">
