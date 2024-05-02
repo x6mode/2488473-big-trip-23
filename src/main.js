@@ -1,5 +1,7 @@
+import Model from './model/first-model.js';
 import Presenter from './presenter/first-present.js';
 
-const executor = new Presenter();
+const Modeler = new Model();
+const Present = new Presenter({routes: Modeler.getRoutes(), routesEdit: Modeler.getRoutesEdit()});
 
-executor.init();
+Present.init();
