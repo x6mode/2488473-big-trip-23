@@ -13,7 +13,27 @@ export default class RoutePresenter {
     this.editView = new EditView({ routesEdit: this.#route });
   }
 
-  #rolldownSubscribe = () => {};
+  keydownHandlerClose = (evt) => {
+    if (isEscape(evt)) {
+      try {
+        replace(this.routeView, this.editView);
+      } catch {}
+    }
+
+    document.removeEventListener('keydown', this.keydownHandlerClose);
+  };
+
+  #rolldownSubscribe = () => {
+    this.editView.element
+      .querySelector('.event__rollup-btn')
+      .addEventListener('click', () => {
+        try {
+          replace(this.routeView, this.editView);
+        } catch {}
+      });
+
+    document.addEventListener('keydown', this.keydownHandlerClose);
+  };
 
   #rollupSubscribe = () => {
     this.routeView.element
@@ -21,11 +41,7 @@ export default class RoutePresenter {
       .addEventListener('click', () => {
         replace(this.editView, this.routeView);
 
-        this.editView.element
-          .querySelector('.event__rollup-btn')
-          .addEventListener('click', () => {
-            replace(this.editView, this.routeView);
-          });
+        this.#rolldownSubscribe();
       });
   };
 
