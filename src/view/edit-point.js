@@ -1,5 +1,5 @@
 import { makeFirstUppercase } from '../utils.js';
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-view.js';
 import { eventTypes, offerTypes } from '../consts.js';
 import dayjs from 'dayjs';
 
@@ -121,8 +121,8 @@ function createEditTemplate(data) {
   </li>`;
 }
 
-export default class EditView extends AbstractView {
-  constructor ({routesEdit}) {
+export default class EditView extends AbstractStatefulView {
+  constructor ({ routesEdit }) {
     super();
     this.routesEdit = routesEdit;
   }
@@ -130,4 +130,6 @@ export default class EditView extends AbstractView {
   get template () {
     return createEditTemplate(this.routesEdit);
   }
+
+  _restoreHandlers() {}
 }

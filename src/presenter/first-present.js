@@ -1,4 +1,6 @@
 import RoutePresenter from './route-presenter.js';
+import SortView from '../view/list-sort.js';
+import { render } from '../framework/render.js';
 
 export default class Presenter {
   #routes = null;
@@ -13,5 +15,8 @@ export default class Presenter {
 
       view.render();
     });
+
+    const sort = new SortView();
+    render(sort, document.querySelector('.trip-events'), 'afterbegin');
   }
 }
