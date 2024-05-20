@@ -1,8 +1,10 @@
 import AbstractView from '../framework/view/abstract-view.js';
+import { isEscape } from '../utils.js';
+import flatpickr from 'flatpickr';
 
 function createNewCardTemplate() {
   return (`
-  <li class="trip-events__item">
+  <li class="trip-events__item trip-events__item-new">
     <form class="event event--edit" action="#" method="post">
       <header class="event__header">
         <div class="event__type-wrapper">
@@ -68,7 +70,7 @@ function createNewCardTemplate() {
           <label class="event__label  event__type-output" for="event-destination-1">
             Flight
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="Chamonix" list="destination-list-1">
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="Geneva" list="destination-list-1">
           <datalist id="destination-list-1">
             <option value="Amsterdam"></option>
             <option value="Geneva"></option>
@@ -78,10 +80,10 @@ function createNewCardTemplate() {
 
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-1">From</label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="18/03/19 12:25">
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="19/03/19 00:00">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">To</label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="18/03/19 13:35">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="19/03/19 00:00">
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -89,14 +91,11 @@ function createNewCardTemplate() {
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="160">
+          <input class="event__input  event__input--price" id="event-price-1" type="number" min="0" name="event-price" value="">
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-        <button class="event__reset-btn" type="reset">Delete</button>
-        <button class="event__rollup-btn" type="button">
-          <span class="visually-hidden">Open event</span>
-        </button>
+        <button class="event__reset-btn" type="reset">Cancel</button>
       </header>
       <section class="event__details">
         <section class="event__section  event__section--offers">
@@ -104,20 +103,20 @@ function createNewCardTemplate() {
 
           <div class="event__available-offers">
             <div class="event__offer-selector">
-              <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" checked>
+              <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage">
               <label class="event__offer-label" for="event-offer-luggage-1">
                 <span class="event__offer-title">Add luggage</span>
                 &plus;&euro;&nbsp;
-                <span class="event__offer-price">50</span>
+                <span class="event__offer-price">30</span>
               </label>
             </div>
 
             <div class="event__offer-selector">
-              <input class="event__offer-checkbox  visually-hidden" id="event-offer-comfort-1" type="checkbox" name="event-offer-comfort" checked>
+              <input class="event__offer-checkbox  visually-hidden" id="event-offer-comfort-1" type="checkbox" name="event-offer-comfort">
               <label class="event__offer-label" for="event-offer-comfort-1">
-                <span class="event__offer-title">Switch to comfort</span>
+                <span class="event__offer-title">Switch to comfort class</span>
                 &plus;&euro;&nbsp;
-                <span class="event__offer-price">80</span>
+                <span class="event__offer-price">100</span>
               </label>
             </div>
 
@@ -152,7 +151,17 @@ function createNewCardTemplate() {
 
         <section class="event__section  event__section--destination">
           <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-          <p class="event__destination-description">Chamonix-Mont-Blanc (usually shortened to Chamonix) is a resort area near the junction of France, Switzerland and Italy. At the base of Mont Blanc, the highest summit in the Alps, it's renowned for its skiing.</p>
+          <p class="event__destination-description">Geneva is a city in Switzerland that lies at the southern tip of expansive Lac Léman (Lake Geneva). Surrounded by the Alps and Jura mountains, the city has views of dramatic Mont Blanc.</p>
+
+          <div class="event__photos-container">
+            <div class="event__photos-tape">
+              <img class="event__photo" src="img/photos/1.jpg" alt="Event photo">
+              <img class="event__photo" src="img/photos/2.jpg" alt="Event photo">
+              <img class="event__photo" src="img/photos/3.jpg" alt="Event photo">
+              <img class="event__photo" src="img/photos/4.jpg" alt="Event photo">
+              <img class="event__photo" src="img/photos/5.jpg" alt="Event photo">
+            </div>
+          </div>
         </section>
       </section>
     </form>
@@ -160,8 +169,50 @@ function createNewCardTemplate() {
   );
 }
 
-export default class NewCardView extends AbstractView {
+export default class NewRouteView extends AbstractView {
+  newEventBtn = document.querySelector('.trip-main__event-add-btn');
+
   get template () {
     return createNewCardTemplate();
+  }
+
+  onKeydownClose = (evt) => {
+    if (isEscape(evt)) {
+      this.onClickClose();
+    }
+  };
+
+  onClickClose = () => {
+    document.querySelector('.trip-events__item-new').remove();
+    document.removeEventListener('keydown', this.onKeydownClose);
+    document.querySelector('.trip-main__event-add-btn').disabled = !document.querySelector('.trip-main__event-add-btn').disabled;
+  };
+
+  init () {
+    const elem = document.querySelector('.trip-events__item-new');
+    const elemCostInput = elem.querySelector('#event-price-1');
+
+    document.querySelector('.trip-main__event-add-btn').disabled = !document.querySelector('.trip-main__event-add-btn').disabled;
+    document.addEventListener('keydown', this.onKeydownClose);
+    elem
+      .querySelector('.event__reset-btn')
+      .addEventListener('click', this.onClickClose);
+
+    elemCostInput.value = '0';
+
+    elemCostInput.addEventListener('input', (evt) => {
+      if (Number(evt.value) < 0) {
+        evt.value = evt.value * -1;
+      }
+    });
+
+    const dateFormat = 'd/m/y H:i';
+    const enableTime = true;
+
+    flatpickr(elem.querySelector('#event-start-time-1'),
+      { dateFormat, enableTime });
+
+    flatpickr(elem.querySelector('#event-end-time-1'),
+      { dateFormat, enableTime });
   }
 }

@@ -2,6 +2,7 @@ import RouteView from '../view/point-route';
 import EditView from '../view/edit-point';
 import { render, replace } from '../framework/render';
 import { isEscape } from '../utils';
+import flatpickr from 'flatpickr';
 
 export default class RoutePresenter {
   #route = null;
@@ -11,6 +12,19 @@ export default class RoutePresenter {
     this.#route = route;
     this.routeView = new RouteView({ route: this.#route });
     this.editView = new EditView({ routesEdit: this.#route });
+  }
+
+  getDatepickerOptions = (type) => ({
+    defaultDate: this.#route[type],
+    dateFormat: 'd/m/y H:i'
+  });
+
+  initFlatpickr () {
+    flatpickr(document.querySelector('#event-start-time-1'),
+      this.getDatepickerOptions('dateFrom'));
+
+    flatpickr(document.querySelector('#event-end-time-1'),
+      this.getDatepickerOptions('dateTo'));
   }
 
   #toggleFavorite = () => {
@@ -56,6 +70,8 @@ export default class RoutePresenter {
       .querySelector('.event__rollup-btn')
       .addEventListener('click', () => {
         replace(this.editView, this.routeView);
+
+        this.initFlatpickr();
 
         this.#editViewSubscribe();
       });
