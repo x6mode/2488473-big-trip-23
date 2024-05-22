@@ -7,6 +7,7 @@ import flatpickr from 'flatpickr';
 export default class RoutePresenter {
   #route = null;
   #container = document.querySelector('.trip-events__list');
+  #state = null;
 
   constructor({ route }) {
     this.#route = route;
@@ -34,6 +35,7 @@ export default class RoutePresenter {
     this.editView = new EditView({ routesEdit: this.#route });
 
     replace(newRouteView, this.routeView);
+    this.#state = 'VIEW';
 
     this.routeView = newRouteView;
     this.#rollupSubscribe();
@@ -43,7 +45,8 @@ export default class RoutePresenter {
     if (isEscape(evt)) {
       try {
         replace(this.routeView, this.editView);
-      } catch {}
+        this.#state = 'VIEW';
+      } catch { /* empty */ }
     }
 
     document.removeEventListener('keydown', this.keydownHandlerClose);
@@ -55,7 +58,8 @@ export default class RoutePresenter {
       .addEventListener('click', () => {
         try {
           replace(this.routeView, this.editView);
-        } catch {}
+          this.#state = 'VIEW';
+        } catch { /* empty */ }
       });
 
     this.routeView.element
@@ -69,21 +73,34 @@ export default class RoutePresenter {
     this.routeView.element
       .querySelector('.event__rollup-btn')
       .addEventListener('click', () => {
-        replace(this.editView, this.routeView);
+        try {
+          replace(this.editView, this.routeView);
+        } catch { /* empty */ }
+        this.#state = 'EDIT';
 
         this.initFlatpickr();
-
         this.#editViewSubscribe();
       });
   };
 
-  render = () => {
-    this.#rollupSubscribe();
+  setStateView = () => {
+    if (this.#state === 'EDIT') {
+      try {
+        replace(this.routeView, this.editView);
+      } catch { /* empty */ }
+      this.#state = 'VIEW';
+      this.#rollupSubscribe();
+    }
+  };
 
+  render = () => {
     this.routeView.element
       .querySelector('.event__favorite-btn')
       .addEventListener('click', this.#toggleFavorite);
 
     render(this.routeView, this.#container);
+    this.#rollupSubscribe();
+
+    this.#state = 'VIEW';
   };
 }

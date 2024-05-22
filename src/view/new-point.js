@@ -1,6 +1,30 @@
 import AbstractView from '../framework/view/abstract-view.js';
 import { isEscape } from '../utils.js';
 import flatpickr from 'flatpickr';
+import { offerTypes } from '../consts.js';
+
+function createOffersTypeTemplate() {
+  let result = '';
+
+  for (let i = 0; i < offerTypes.length; i++) {
+
+    const offerName = Object.keys(offerTypes[i])[0];
+    const offerDesc = offerTypes[i][Object.keys(offerTypes[i])[0]];
+    const offerPrice = offerTypes[i].price;
+
+    result += `
+    <div class="event__offer-selector">
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offerName}-1" type="checkbox" name="event-offer-${offerName}">
+      <label class="event__offer-label" for="event-offer-${offerName}-1">
+        <span class="event__offer-title">${offerDesc}</span>
+        &plus;&euro;&nbsp;
+        <span class="event__offer-price">${offerPrice}</span>
+      </label>
+    </div>
+    `;
+  }
+  return result;
+}
 
 function createNewCardTemplate() {
   return (`
@@ -102,50 +126,7 @@ function createNewCardTemplate() {
           <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
           <div class="event__available-offers">
-            <div class="event__offer-selector">
-              <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage">
-              <label class="event__offer-label" for="event-offer-luggage-1">
-                <span class="event__offer-title">Add luggage</span>
-                &plus;&euro;&nbsp;
-                <span class="event__offer-price">30</span>
-              </label>
-            </div>
-
-            <div class="event__offer-selector">
-              <input class="event__offer-checkbox  visually-hidden" id="event-offer-comfort-1" type="checkbox" name="event-offer-comfort">
-              <label class="event__offer-label" for="event-offer-comfort-1">
-                <span class="event__offer-title">Switch to comfort class</span>
-                &plus;&euro;&nbsp;
-                <span class="event__offer-price">100</span>
-              </label>
-            </div>
-
-            <div class="event__offer-selector">
-              <input class="event__offer-checkbox  visually-hidden" id="event-offer-meal-1" type="checkbox" name="event-offer-meal">
-              <label class="event__offer-label" for="event-offer-meal-1">
-                <span class="event__offer-title">Add meal</span>
-                &plus;&euro;&nbsp;
-                <span class="event__offer-price">15</span>
-              </label>
-            </div>
-
-            <div class="event__offer-selector">
-              <input class="event__offer-checkbox  visually-hidden" id="event-offer-seats-1" type="checkbox" name="event-offer-seats">
-              <label class="event__offer-label" for="event-offer-seats-1">
-                <span class="event__offer-title">Choose seats</span>
-                &plus;&euro;&nbsp;
-                <span class="event__offer-price">5</span>
-              </label>
-            </div>
-
-            <div class="event__offer-selector">
-              <input class="event__offer-checkbox  visually-hidden" id="event-offer-train-1" type="checkbox" name="event-offer-train">
-              <label class="event__offer-label" for="event-offer-train-1">
-                <span class="event__offer-title">Travel by train</span>
-                &plus;&euro;&nbsp;
-                <span class="event__offer-price">40</span>
-              </label>
-            </div>
+            ${ createOffersTypeTemplate() }
           </div>
         </section>
 
@@ -191,6 +172,14 @@ export default class NewRouteView extends AbstractView {
   init () {
     const elem = document.querySelector('.trip-events__item-new');
     const elemCostInput = elem.querySelector('#event-price-1');
+
+    const elemDestantionInput = elem.querySelector('#event-destination-1');
+    const elemDateStart = elem.querySelector('#event-start-time-1');
+    const elemDateEnd = elem.querySelector('#event-end-time-1');
+
+    [elemDestantionInput, elemDateStart, elemDateEnd].forEach((item) => {
+      item.value = '';
+    });
 
     document.querySelector('.trip-main__event-add-btn').disabled = !document.querySelector('.trip-main__event-add-btn').disabled;
     document.addEventListener('keydown', this.onKeydownClose);
