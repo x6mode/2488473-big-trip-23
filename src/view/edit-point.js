@@ -1,6 +1,5 @@
-import { makeFirstUppercase } from '../utils.js';
 import AbstractStatefulView from '../framework/view/abstract-view.js';
-import { eventTypes, offerTypes } from '../consts.js';
+import { eventTypes } from '../consts.js';
 
 function createEventTypeTemplate(selectedType = '') {
   let result = '';
@@ -9,34 +8,7 @@ function createEventTypeTemplate(selectedType = '') {
     result += `
     <div class="event__type-item">
       <input id="event-type-${eventTypes[i]}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${eventTypes[i]}" ${eventTypes[i] === selectedType ? 'checked' : ''}>
-      <label class="event__type-label  event__type-label--${eventTypes[i]}" for="event-type-${eventTypes[i]}-1">${makeFirstUppercase(eventTypes[i])}</label>
-    </div>
-    `;
-  }
-
-  return result;
-}
-
-function createOfferTypeTemplate(offers = []) {
-  let result = '';
-  const selectedOffers = [];
-
-  offers.forEach((item) => selectedOffers.push(item.title));
-
-  for (let i = 0; i < offerTypes.length; i++) {
-
-    const offerName = Object.keys(offerTypes[i])[0];
-    const offerDesc = offerTypes[i][Object.keys(offerTypes[i])[0]];
-    const offerPrice = offerTypes[i].price;
-
-    result += `
-    <div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offerName}-1" type="checkbox" name="event-offer-${offerName}" ${selectedOffers.includes(offerDesc) ? 'checked' : ''}>
-      <label class="event__offer-label" for="event-offer-${offerName}-1">
-        <span class="event__offer-title">${offerDesc}</span>
-        &plus;&euro;&nbsp;
-        <span class="event__offer-price">${offerPrice}</span>
-      </label>
+      <label class="event__type-label  event__type-label--${eventTypes[i]}" for="event-type-${eventTypes[i]}-1 upcs">${eventTypes[i]}</label>
     </div>
     `;
   }
@@ -66,10 +38,10 @@ function createEditTemplate(data) {
         </div>
 
         <div class="event__field-group  event__field-group--destination">
-          <label class="event__label  event__type-output" for="event-destination-1">
-            ${makeFirstUppercase(data.type)}
+          <label class="event__label  event__type-output upcs" for="event-destination-1">
+            ${data.type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${data.name}" list="destination-list-1">
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${data.destination}" list="destination-list-1">
           <datalist id="destination-list-1">
             <option value="Amsterdam"></option>
             <option value="Geneva"></option>
@@ -81,7 +53,8 @@ function createEditTemplate(data) {
           <label class="visually-hidden" for="event-start-time-1">From</label>
           <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${data.dateFrom}">
           &mdash;
-          <label class="visually-hidden" for="event-end-time-1">To</label>
+          <label class="visually-hidden" for=
+          console.log(all[0].offers.length)"event-end-time-1">To</label>
           <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${data.dateTo}">
         </div>
 
@@ -99,20 +72,7 @@ function createEditTemplate(data) {
           <span class="visually-hidden">Open event</span>
         </button>
       </header>
-      <section class="event__details">
-        <section class="event__section  event__section--offers">
-          <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-
-          <div class="event__available-offers">
-            ${createOfferTypeTemplate(data.offers)}
-          </div>
-        </section>
-
-        <section class="event__section  event__section--destination">
-          <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-          <p class="event__destination-description">${data.description}</p>
-        </section>
-      </section>
+      <section class="event__details"></section>
     </form>
   </li>`;
 }
@@ -126,6 +86,4 @@ export default class EditView extends AbstractStatefulView {
   get template () {
     return createEditTemplate(this.routesEdit);
   }
-
-  _restoreHandlers() {}
 }

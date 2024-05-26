@@ -1,4 +1,9 @@
 const timeFormat = 'HH:mm';
+const timeFormatView = {
+  minutly: 'mm[M]',
+  hourly: 'HH[H] mm[M]',
+  dayly: 'DD[D] HH[H] mm[M]'
+};
 const timeFormatEdit = 'DD/MM/YY HH:mm';
 
 const eventTypes = [
@@ -20,4 +25,6 @@ const offerTypes = [
   { train: 'Travel by train', price: 40 },
 ];
 
-export { timeFormat as default, eventTypes, offerTypes, timeFormatEdit };
+const connectionFields = ['https://23.objects.htmlacademy.pro', 'Basic aerb6Hfwj43C'];
+
+export { timeFormat as default, eventTypes, offerTypes, timeFormatEdit, connectionFields, timeFormatView };
