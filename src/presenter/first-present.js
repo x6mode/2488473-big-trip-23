@@ -32,7 +32,7 @@ export default class Presenter {
   };
 
   init(allDestanation) {
-    const topFrame = new TopFrame({ info: { cost: this.#routes.reduce((currentSum, item) => currentSum + item.basePrice, 0) } });
+    const topFrame = new TopFrame({ allRoutes: this.#routes, allDestanation});
     render(topFrame, document.querySelector('.trip-main'), 'afterbegin');
 
     const filter = new FilterView();
