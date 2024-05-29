@@ -32,6 +32,9 @@ export default class Presenter {
   };
 
   init(allDestanation) {
+    const addEventBtn = document.querySelector('.trip-main__event-add-btn');
+    addEventBtn.disabled = false;
+
     const topFrame = new TopFrame({ allRoutes: this.#routes, allDestanation});
     render(topFrame, document.querySelector('.trip-main'), 'afterbegin');
 
@@ -54,7 +57,6 @@ export default class Presenter {
       });
     });
 
-    const addEventBtn = document.querySelector('.trip-main__event-add-btn');
     addEventBtn.addEventListener('click', () => {
       this.closeAllRoutes();
       const newRouteView = new NewRouteView(this.#offers);

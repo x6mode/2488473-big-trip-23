@@ -102,7 +102,6 @@ function createNewCardTemplate() {
 export default class NewRouteView extends AbstractView {
   #offers = null;
   #offersView = null;
-  newEventBtn = document.querySelector('.trip-main__event-add-btn');
 
   constructor (offers) {
     super();

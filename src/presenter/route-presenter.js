@@ -5,6 +5,7 @@ import DestionationView from '../view/destination-legend';
 import { render, replace } from '../framework/render';
 import { isEscape } from '../utils';
 import flatpickr from 'flatpickr';
+import { removeRoute } from '../model/task-api-getter';
 
 export default class RoutePresenter {
   #route = null;
@@ -91,6 +92,21 @@ export default class RoutePresenter {
       .addEventListener('click', () => {
         try {
           replace(this.editView, this.routeView);
+          this.editView
+            .element
+            .querySelector('.event__reset-btn')
+            .addEventListener('click', (evt) => {
+              evt.target.textContent = 'Deleting...';
+              removeRoute(this.#route.id)
+                .then((data) => {
+                  if (data.status === 204) {
+                    this.editView.element.remove();
+                    document.removeEventListener('keydown', this.keydownHandlerClose);
+                  }
+                })
+                .catch(() => this.editView.shake(() => {}));
+            });
+
           const eventDetails = this.editView.element.querySelector('.event__details');
           render(this.destionationView, eventDetails);
           render(this.offersView, eventDetails, 'afterbegin');

@@ -26,4 +26,9 @@ async function getAllRoutesOffers () {
     .then((data) => data);
 }
 
-export { getDestantionNameByID as default, getAllRoutesOffers };
+async function removeRoute (ID) {
+  return await router
+    ._load({url: `big-trip/points/${ID}`, method: 'DELETE'});
+}
+
+export { getDestantionNameByID as default, getAllRoutesOffers, removeRoute };
