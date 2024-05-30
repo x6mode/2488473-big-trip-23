@@ -142,14 +142,14 @@ export default class RoutePresenter {
             .querySelector('.event__save-btn')
             .addEventListener('click', (evt) => {
               evt.preventDefault();
-              this.#route.type = typeCopy;
-              this.routeView = new RouteView({ route: this.#route, allOffers: this.#allOffers
-                .filter((item) => item.type === this.#route.type) });
-              this.#rollupSubscribe();
-              this.offersView.element.remove();
-              this.#state = 'VIEW';
               try {
+                this.offersView.element.remove();
+                this.#route.type = typeCopy;
+                this.routeView = new RouteView({ route: this.#route, allOffers: this.#allOffers
+                  .filter((item) => item.type === this.#route.type) });
                 replace(this.routeView, this.editView);
+                this.#rollupSubscribe();
+                this.#state = 'VIEW';
               } catch { /* empty */ }
             });
 
@@ -169,11 +169,11 @@ export default class RoutePresenter {
             });
 
           render(this.destionationView, eventDetails);
-        } catch { /* empty */ }
-        this.#state = 'EDIT';
+          this.#state = 'EDIT';
 
-        this.initFlatpickr();
-        this.#editViewSubscribe();
+          this.initFlatpickr();
+          this.#editViewSubscribe();
+        } catch { /* empty */ }
       });
   };
 
