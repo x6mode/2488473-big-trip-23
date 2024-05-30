@@ -1,26 +1,28 @@
 import RouteView from '../view/point-route';
 import EditView from '../view/edit-point';
-import OffersView from '../view/offers-list';
 import DestionationView from '../view/destination-legend';
 import { render, replace } from '../framework/render';
 import { isEscape } from '../utils';
 import flatpickr from 'flatpickr';
 import { removeRoute } from '../model/task-api-getter';
+import offersView from '../view/offers-list';
 
 export default class RoutePresenter {
   #route = null;
   #allOffers = null;
   #state = null;
+  #allDestanation = null;
   #container = document.querySelector('.trip-events__list');
 
-  constructor({ route, offers }) {
+  constructor({ route, offers, allDestanation }) {
+    this.#allDestanation = allDestanation;
     this.#allOffers = offers;
     this.#route = route;
     this.routeView = new RouteView({ route: this.#route, allOffers: this.#allOffers
       .filter((item) => item.type === this.#route.type) });
     this.editView = new EditView({ routesEdit: this.#route });
-    this.destionationView = new DestionationView('./src/route-presenter.js | 20 line | this is test sets by <--- this');
-    this.offersView = new OffersView({
+    this.destionationView = new DestionationView('./src/route-presenter.js | 22 line | this is test sets by <--- this');
+    this.offersView = new offersView({
       selected: this.#route.offers,
       typedAll: this.#allOffers
         .filter((item) => item.type === this.#route.type)
@@ -35,13 +37,13 @@ export default class RoutePresenter {
     dateFormat: 'd/m/y H:i'
   });
 
-  initFlatpickr () {
+  initFlatpickr = () => {
     flatpickr(document.querySelector('#event-start-time-1'),
       this.getDatepickerOptions('dateFrom'));
 
     flatpickr(document.querySelector('#event-end-time-1'),
       this.getDatepickerOptions('dateTo'));
-  }
+  };
 
   #toggleFavorite = () => {
 
@@ -91,7 +93,66 @@ export default class RoutePresenter {
       .querySelector('.event__rollup-btn')
       .addEventListener('click', () => {
         try {
+          const eventDetails = this.editView.element.querySelector('.event__details');
           replace(this.editView, this.routeView);
+          this.offersView = new offersView({
+            selected: this.#route.offers,
+            typedAll: this.#allOffers
+              .filter((item) => item.type === this.#route.type)
+          });
+          render(this.offersView, eventDetails, 'afterbegin');
+
+          let typeCopy = null;
+
+          this.editView.element.querySelector('.event__type-icon').src = `img/icons/${this.#route.type}.png`;
+          this.editView.element.querySelector('.event__type-output').textContent = this.#route.type;
+
+          this.editView
+            .element
+            .querySelectorAll('.event__type-input')
+            .forEach((item) => {
+              if (item.value === this.#route.type) {
+                item.checked = true;
+              }
+
+              item.addEventListener('click', (evt) => {
+                document.querySelector('#event-type-toggle-1').checked = false;
+
+                this.editView.element.querySelector('.event__type-icon').src = `img/icons/${evt.target.value}.png`;
+                this.editView.element.querySelector('.event__type-output').textContent = evt.target.value;
+                typeCopy = evt.target.value;
+
+
+                if (evt.target.value !== 'sightseeing') {
+                  this.offersView.element.remove();
+
+                  this.offersView = new offersView({
+                    selected: [],
+                    typedAll: this.#allOffers.filter((el) => el.type === evt.target.value)
+                  });
+                  render(this.offersView, this.editView.element.querySelector('.event__details'), 'afterbegin');
+                } else {
+                  this.offersView.element.remove();
+                }
+              });
+            });
+
+          this.editView
+            .element
+            .querySelector('.event__save-btn')
+            .addEventListener('click', (evt) => {
+              evt.preventDefault();
+              this.#route.type = typeCopy;
+              this.routeView = new RouteView({ route: this.#route, allOffers: this.#allOffers
+                .filter((item) => item.type === this.#route.type) });
+              this.#rollupSubscribe();
+              this.offersView.element.remove();
+              this.#state = 'VIEW';
+              try {
+                replace(this.routeView, this.editView);
+              } catch { /* empty */ }
+            });
+
           this.editView
             .element
             .querySelector('.event__reset-btn')
@@ -107,9 +168,7 @@ export default class RoutePresenter {
                 .catch(() => this.editView.shake(() => {}));
             });
 
-          const eventDetails = this.editView.element.querySelector('.event__details');
           render(this.destionationView, eventDetails);
-          render(this.offersView, eventDetails, 'afterbegin');
         } catch { /* empty */ }
         this.#state = 'EDIT';
 

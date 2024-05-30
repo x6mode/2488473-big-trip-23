@@ -2,7 +2,6 @@ import RoutePresenter from './route-presenter.js';
 import SortView from '../view/list-sort.js';
 import FilterView from '../view/list-filter.js';
 import DestionationPhotoView from '../view/destionation-photo.js';
-import getDestantionNameByID from '../model/task-api-getter';
 import TopFrame from '../view/top-frame.js';
 import NewRouteView from '../view/new-point.js';
 import { render } from '../framework/render.js';
@@ -47,14 +46,16 @@ export default class Presenter {
     document.querySelector('#sort-day').checked = true;
 
     this.#routes.forEach((item) => {
-      getDestantionNameByID(item.destination).then((data) => {
-        item.destination = data;
-
-        const view = new RoutePresenter({ route: item, offers: this.#offers });
-        this.routesInstanse.push(view);
-
-        view.render();
+      allDestanation.map((el) => {
+        if (el.id === item.destination) {
+          item.destination = el.name;
+        }
       });
+
+      const view = new RoutePresenter({ route: item, offers: this.#offers, allDestanation });
+      this.routesInstanse.push(view);
+
+      view.render();
     });
 
     addEventBtn.addEventListener('click', () => {

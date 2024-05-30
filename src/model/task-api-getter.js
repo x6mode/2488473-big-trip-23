@@ -3,20 +3,11 @@ import { connectionFields } from '../consts';
 
 const router = new ApiService(...connectionFields);
 
-async function getDestantionNameByID (ID = '') {
+async function getDestantionNameByID () {
   return await router
     ._load({url: 'big-trip/destinations'})
     .then(ApiService.parseResponse)
-    .then((data) => {
-      if (ID !== '') {
-        for(let i = 0; i < data.length; i++) {
-          if (data[i].id === ID) {
-            return data[i].name;
-          }
-        }
-      }
-      return data;
-    });
+    .then((data) => data);
 }
 
 async function getAllRoutesOffers () {
