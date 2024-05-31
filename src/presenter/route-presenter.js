@@ -6,6 +6,7 @@ import { isEscape } from '../utils';
 import flatpickr from 'flatpickr';
 import { removeRoute } from '../model/task-api-getter';
 import offersView from '../view/offers-list';
+import DestionationPhotoView from '../view/destionation-photo';
 
 export default class RoutePresenter {
   #route = null;
@@ -21,7 +22,6 @@ export default class RoutePresenter {
     this.routeView = new RouteView({ route: this.#route, allOffers: this.#allOffers
       .filter((item) => item.type === this.#route.type) });
     this.editView = new EditView({ routesEdit: this.#route });
-    this.destionationView = new DestionationView('./src/route-presenter.js | 22 line | this is test sets by <--- this');
     this.offersView = new offersView({
       selected: this.#route.offers,
       typedAll: this.#allOffers
@@ -88,13 +88,23 @@ export default class RoutePresenter {
     document.addEventListener('keydown', this.keydownHandlerClose);
   };
 
-  #rollupSubscribe = () => {
+  #rollupSubscribe () {
     this.routeView.element
       .querySelector('.event__rollup-btn')
       .addEventListener('click', () => {
         try {
           const eventDetails = this.editView.element.querySelector('.event__details');
-          replace(this.editView, this.routeView);
+          const destinationView = new DestionationView(this.#allDestanation.filter((item) => item.name === this.#route.destination)[0].description);
+          const destinationPhotoView = new DestionationPhotoView(this.#allDestanation.filter((item) => item.name === this.#route.destination)[0].pictures);
+          try {
+            replace(this.editView, this.routeView);
+            this.initFlatpickr();
+            this.#editViewSubscribe();
+            this.#state = 'EDIT';
+          } catch { /* empty */ }
+          eventDetails.innerHTML = '';
+          render(destinationView, eventDetails);
+          render(destinationPhotoView, eventDetails);
           this.offersView = new offersView({
             selected: this.#route.offers,
             typedAll: this.#allOffers
@@ -155,6 +165,38 @@ export default class RoutePresenter {
 
           this.editView
             .element
+            .querySelector('#event-destination-1')
+            .addEventListener('input', (evt) => {
+              this.editView.element.querySelector('#event-destination-1').value = evt.target.value;
+
+              // for (let i = 0; i < allDestanation.length; i++) {
+              //   if (allDestanation[i].name === evt.target.value && allDestanation[i].description !== '') {
+              //     if (this.#destionationPhotoView) {
+              //       this.#destionationPhotoView.element.remove();
+              //     }
+              //     if (this.#destionationView) {
+              //       this.#destionationView.element.remove();
+              //     }
+              //     this.#destionationView = new DestionationView(allDestanation[i].description);
+              //     render(this.#destionationView, newRouteView.element.querySelector('.event__details'));
+
+              //     if (allDestanation[i].pictures.length > 0) {
+              //       this.#destionationPhotoView = new DestionationPhotoView(allDestanation[i].pictures);
+              //       render(this.#destionationPhotoView, newRouteView.element.querySelector('.event__section--destination'));
+              //     }
+              //   } else if (allDestanation[i].name === evt.target.value && allDestanation[i].description === '') {
+              //     if (this.#destionationPhotoView) {
+              //       this.#destionationPhotoView.element.remove();
+              //     }
+              //     if (this.#destionationView) {
+              //       this.#destionationView.element.remove();
+              //     }
+              //   }
+              // }
+            });
+
+          this.editView
+            .element
             .querySelector('.event__reset-btn')
             .addEventListener('click', (evt) => {
               evt.target.textContent = 'Deleting...';
@@ -167,15 +209,10 @@ export default class RoutePresenter {
                 })
                 .catch(() => this.editView.shake(() => {}));
             });
-
-          render(this.destionationView, eventDetails);
           this.#state = 'EDIT';
-
-          this.initFlatpickr();
-          this.#editViewSubscribe();
-        } catch { /* empty */ }
+        } catch { /** empty */ }
       });
-  };
+  }
 
   setStateView = () => {
     if (this.#state === 'EDIT') {
