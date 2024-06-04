@@ -1,5 +1,4 @@
 import RoutePresenter from './route-presenter.js';
-import SortView from '../view/list-sort.js';
 import FilterView from '../view/list-filter.js';
 import DestionationPhotoView from '../view/destionation-photo.js';
 import TopFrame from '../view/top-frame.js';
@@ -16,7 +15,8 @@ export default class Presenter {
   #destionationPhotoView = null;
   routesInstanse = [];
 
-  constructor({ routes, offers }) {
+  constructor({ routes, offers, original }) {
+    this.original = original;
     this.#routes = routes;
     this.#offers = offers;
     this.#offersView = new offersView({selected: [], typedAll: this.#offers.filter((item) => item.type === 'flight')});
@@ -34,16 +34,13 @@ export default class Presenter {
     const addEventBtn = document.querySelector('.trip-main__event-add-btn');
     addEventBtn.disabled = false;
 
-    const topFrame = new TopFrame({ allRoutes: this.#routes, allDestanation});
+    const topFrame = new TopFrame({ allRoutes: this.original, allDestanation});
     render(topFrame, document.querySelector('.trip-main'), 'afterbegin');
 
     const filter = new FilterView();
-    render(filter, document.querySelector('.trip-controls'));
-
-    const sort = new SortView();
-    render(sort, document.querySelector('.trip-events'), 'afterbegin');
-
-    document.querySelector('#sort-day').checked = true;
+    try {
+      render(filter, document.querySelector('.trip-controls'));
+    } catch { /** empty */ }
 
     this.#routes.forEach((item) => {
       allDestanation.map((el) => {
