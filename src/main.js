@@ -1,7 +1,7 @@
 import { connectionFields } from './consts.js';
 import Model from './model/first-model.js';
 import getDestantionNameByID, { getAllRoutesOffers } from './model/task-api-getter.js';
-import Presenter from './presenter/first-present.js';
+import FilterPresenter from './presenter/filterPresenter.js';
 
 
 const Modeler = new Model(...connectionFields);
@@ -20,9 +20,9 @@ Modeler
         getDestantionNameByID()
           .then((allDestanation) => {
             document.querySelector('.trip-events__msg').remove();
-            const Present = new Presenter({routes, offers});
 
-            Present.init(allDestanation);
+            const filterPresenter = new FilterPresenter(routes, offers, allDestanation);
+            filterPresenter.init();
           });
       });
   });
