@@ -8,7 +8,6 @@ export default class sortPresenter {
   allDestanation = null;
   headPresenter = null;
   sortView = null;
-
   sortDay = null;
   sortTime = null;
   sortPrice = null;
