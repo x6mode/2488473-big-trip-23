@@ -48,7 +48,7 @@ export default class RoutePresenter {
     // });
   }
 
-  // -- SPEC -- //
+  // -- SPEC -- [packs subscribers for fast use in (re)render component] //
 
   #routeViewPackSubscribe = () => {
     this.#favoriteRouteViewSubscribe();
@@ -60,7 +60,7 @@ export default class RoutePresenter {
     this.#openRouteViewSubscribe();
   };
 
-  // -- HELPFUL FUNC -- //
+  // -- HELPFUL FUNC -- [main func for render] //
 
   #reRenderRouteView = () => {
     const newRouteView = new RouteView(this.#route, this.#offers.filter((el) => el.type === this.#route.type));
@@ -86,7 +86,7 @@ export default class RoutePresenter {
     this.#routeViewPackSubscribe();
   };
 
-  // -- MODEL EDIT -- //
+  // -- MODEL EDIT -- [edit model] //
 
   #toggleFavorite = () => {
     this.#route.isFavorite = !this.#route.isFavorite;
@@ -95,7 +95,7 @@ export default class RoutePresenter {
   };
 
 
-  // -- SUBSCRIBERS -- //
+  // -- SUBSCRIBERS --  [work with DOM] //
 
   #favoriteRouteViewSubscribe = () => {
     this.#routeView
