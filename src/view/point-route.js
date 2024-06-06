@@ -88,7 +88,7 @@ export default class RouteView extends AbstractView {
   #route = null;
   #allOffers = null;
 
-  constructor({ route, allOffers }) {
+  constructor(route, allOffers) {
     super();
     this.#route = route;
     this.#allOffers = allOffers[0];

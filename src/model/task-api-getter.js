@@ -3,18 +3,24 @@ import { connectionFields } from '../consts';
 
 const router = new ApiService(...connectionFields);
 
-async function getDestantionNameByID () {
+async function getDestinations () {
   return await router
     ._load({url: 'big-trip/destinations'})
     .then(ApiService.parseResponse)
     .then((data) => data);
 }
 
-async function getAllRoutesOffers () {
+async function getOffers () {
   return await router
     ._load({url: 'big-trip/offers'})
     .then(ApiService.parseResponse)
     .then((data) => data);
+}
+
+async function getRoutes(adaptFunc) {
+  return router._load({url: 'big-trip/points'})
+    .then(ApiService.parseResponse)
+    .then((data) => data.map(adaptFunc));
 }
 
 async function removeRoute (ID) {
@@ -22,4 +28,4 @@ async function removeRoute (ID) {
     ._load({url: `big-trip/points/${ID}`, method: 'DELETE'});
 }
 
-export { getDestantionNameByID as default, getAllRoutesOffers, removeRoute };
+export { getOffers, getDestinations, removeRoute, getRoutes };

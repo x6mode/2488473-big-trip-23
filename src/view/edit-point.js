@@ -105,7 +105,7 @@ function createEditTemplate(data) {
 }
 
 export default class EditView extends AbstractStatefulView {
-  constructor ({ routesEdit }) {
+  constructor (routesEdit) {
     super();
     this.routesEdit = routesEdit;
   }

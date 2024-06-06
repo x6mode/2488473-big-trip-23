@@ -1,12 +1,13 @@
 import ApiService from '../framework/api-service';
-import getRandomRoute, { mockRoutesEdit } from '../mock/mock-data';
+import { getDestinations, getOffers, getRoutes } from './task-api-getter';
 
 export default class Model extends ApiService{
+  offers = [];
+  destinations = [];
+  routes = [];
 
-  async allRoutes () {
-    return await this._load({url: 'big-trip/points'})
-      .then(ApiService.parseResponse)
-      .then((data) => data.map(this.#adaptToClient));
+  constructor(props) {
+    super(props);
   }
 
   #adaptToClient (route) {
@@ -26,14 +27,11 @@ export default class Model extends ApiService{
     return adaptedRoute;
   }
 
-  routes = Array.from({length: 5}, getRandomRoute);
-  routesEdit = mockRoutesEdit;
+  init = async () => {
+    this.offers = await getOffers();
+    this.destinations = await getDestinations();
+    this.routes = await getRoutes(this.#adaptToClient);
 
-  getRoutes() {
-    return this.routes;
-  }
-
-  getRoutesEdit() {
-    return this.routesEdit;
-  }
+    return ([this.offers, this.destinations, this.routes]);
+  };
 }
