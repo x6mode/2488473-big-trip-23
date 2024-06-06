@@ -17,6 +17,8 @@ function createPhotoTemplate (array) {
       </div>
     </div>
     `);
+  } else {
+    return '<div></div>';
   }
 }
 

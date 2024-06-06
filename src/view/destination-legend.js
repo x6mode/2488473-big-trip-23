@@ -8,6 +8,8 @@ function createDestionationTemplate(legend) {
         <p class="event__destination-description">${legend}</p>
       </section>
     `);
+  } else {
+    return '<div></div>';
   }
 }
 

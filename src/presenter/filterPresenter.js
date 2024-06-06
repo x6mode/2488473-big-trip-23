@@ -20,7 +20,7 @@ export default class sortPresenter {
     this.allDestanation = allDestanation;
     this.sortView = new SortView();
 
-    this.sortDay = this.routes.slice();
+    this.sortDay = this.routes.slice().reverse();
     this.sortTime = null;
     this.sortPrice = this.routes.slice().sort((a, b) => b.basePrice - a.basePrice);
     this.headPresenter = null;
@@ -69,7 +69,7 @@ export default class sortPresenter {
   init () {
     render(this.sortView, document.querySelector('.trip-events'), 'afterbegin');
     document.querySelector('#sort-day').checked = true;
-    this.initHeadPresenter(this.routes, false);
+    this.initHeadPresenter(this.sortDay, false);
 
     this.sortView
       .element

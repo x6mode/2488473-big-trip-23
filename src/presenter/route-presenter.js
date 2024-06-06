@@ -1,51 +1,38 @@
 import RouteView from '../view/point-route';
 import EditView from '../view/edit-point';
 import DestionationView from '../view/destination-legend';
-import { render, remove, replace } from '../framework/render';
+import { render, replace } from '../framework/render';
 import { isEscape } from '../utils';
 import flatpickr from 'flatpickr';
-import { removeRoute } from '../model/task-api-getter';
-import offersView from '../view/offers-list';
+// import { removeRoute } from '../model/task-api-getter';
+import OffersView from '../view/offers-list';
 import DestionationPhotoView from '../view/destionation-photo';
 
 export default class RoutePresenter {
   #container = document.querySelector('.trip-events__list');
-  #state = undefined;
+  #state = null;
 
   #offers = null;
+  #destionations = null;
 
   #route = null;
 
   #routeView = null;
   #editView = null;
 
+  #offesView = null;
+  #legendView = null;
+  #photoView = null;
 
-  // #allOffers = null;
-  // #state = null;
-  // #allDestanation = null;
-
-
-  constructor({ route, offers }) {
+  constructor({ route, offers, destionations }) {
     this.#offers = offers;
+    this.#destionations = destionations;
 
     this.#route = route;
 
     this.#routeView = new RouteView(this.#route, this.#offers
       .filter((el) => el.type === this.#route.type));
     this.#editView = new EditView(this.#route);
-
-
-    // this.#allDestanation = allDestanation;
-    // this.#allOffers = offers;
-    // this.#route = route;
-    // // this.routeView = new RouteView({ route: this.#route, allOffers: this.#allOffers
-    // //   .filter((item) => item.type === this.#route.type) });
-    // this.editView = new EditView(this.#route);
-    // this.offersView = new offersView({
-    //   selected: this.#route.offers,
-    //   typedAll: this.#allOffers
-    //     .filter((item) => item.type === this.#route.type)
-    // });
   }
 
   // -- SPEC -- [packs subscribers for fast use in (re)render component] //
@@ -58,9 +45,11 @@ export default class RoutePresenter {
 
   #editViewSubscribe = () => {
     this.#openRouteViewSubscribe();
+    // ...more
   };
 
-  // -- HELPFUL FUNC -- [main func for render] //
+
+  // -- LOGIC FUNC -- [main func for render] //
 
   #reRenderRouteView = () => {
     const newRouteView = new RouteView(this.#route, this.#offers.filter((el) => el.type === this.#route.type));
@@ -72,19 +61,38 @@ export default class RoutePresenter {
     this.#state = 'VIEW';
   };
 
+  #initEditView = () => {
+    const thisDestionation = this.#destionations.filter((el) => el.name === this.#route.destination)[0];
+
+    const container = this.#editView.element
+      .querySelector('.event__details');
+
+    this.#initFlatpickr();
+    this.#initOffersChooserSubscribe(container);
+    this.#initDestInfoChooserSubscribe(container, thisDestionation);
+  };
+
   #switchViewToEdit = () => {
     replace(this.#editView, this.#routeView);
     this.#state = 'EDIT';
 
+    this.#initEditView();
     this.#editViewSubscribe();
   };
 
   #switchEditToView = () => {
+    this.#editView
+      .element
+      .querySelector('.event__details')
+      .innerHTML = '';
+    document.removeEventListener('keydown', this.#handleKeydownCloseEdit);
+
     replace(this.#routeView, this.#editView);
     this.#state = 'VIEW';
 
     this.#routeViewPackSubscribe();
   };
+
 
   // -- MODEL EDIT -- [edit model] //
 
@@ -116,9 +124,96 @@ export default class RoutePresenter {
       .element
       .querySelector('.event__rollup-btn')
       .addEventListener('click', this.#switchEditToView);
+
+    document.addEventListener('keydown', this.#handleKeydownCloseEdit);
   };
 
-  // -- INIT -- //
+  #initFlatpickr = () => {
+    flatpickr(this.#editView.element.querySelector('#event-start-time-1'),
+      this.getDatepickerOptions('dateFrom'));
+
+    flatpickr(this.#editView.element.querySelector('#event-end-time-1'),
+      this.getDatepickerOptions('dateTo'));
+  };
+
+  #initDestInfoChooserSubscribe = (container, thisDestionation) => {
+
+    this.#legendView = new DestionationView(thisDestionation.description);
+    render(this.#legendView, container);
+
+    this.#photoView = new DestionationPhotoView(thisDestionation.pictures);
+    render(this.#photoView, container);
+
+    const inputEventName = this.#editView.element.querySelector('#event-destination-1');
+
+    const datalistContainer = this.#editView.element.querySelector('#destination-list-1');
+
+    inputEventName.value = this.#route.destination;
+
+    datalistContainer.innerHTML = '';
+    this.#destionations.forEach((item) => {
+      datalistContainer.innerHTML += `<option value='${item.name}'></option>`;
+    });
+
+    inputEventName.addEventListener('input', this.#handleInputDestionation(thisDestionation));
+  };
+
+  #initOffersChooserSubscribe = (container) => {
+    this.#offesView = new OffersView(this.#route.offers, this.#offers.filter((el) => el.type === this.#route.type));
+    render(this.#offesView, container);
+
+    const eventInFiledset = this.#editView.element.querySelector(`#event-type-${this.#route.type}-1`);
+    const eventTypeToggler = this.#editView.element.querySelector('.event__type-toggle');
+    const eventTypeText = this.#editView.element.querySelector('.event__type-output');
+    const eventTypeIcon = this.#editView.element.querySelector('.event__type-icon');
+
+    eventInFiledset.checked = true;
+    eventTypeText.textContent = this.#route.type;
+    eventTypeIcon.src = `img/icons/${this.#route.type}.png`;
+
+    this.#editView
+      .element
+      .querySelectorAll('.event__type-input')
+      .forEach((nodeElem) => {
+        nodeElem.addEventListener('click', this.#handleClickEventType(eventTypeToggler, eventTypeText, eventTypeIcon));
+      });
+  };
+
+
+  // -- HANDLERS -- //
+
+  #handleInputDestionation = (thisDestionation) => (evt) => {
+    thisDestionation = this.#destionations.filter((el) => el.name === evt.target.value)[0];
+
+    if (typeof thisDestionation !== 'undefined') {
+      const newLegendComponent = new DestionationView(thisDestionation.description);
+      replace(newLegendComponent, this.#legendView);
+      this.#legendView = newLegendComponent;
+
+      const newPhotoComponent = new DestionationPhotoView(thisDestionation.pictures);
+      replace(newPhotoComponent, this.#photoView);
+      this.#photoView = newPhotoComponent;
+    }
+  };
+
+  #handleClickEventType = (eventTypeToggler, eventTypeText, eventTypeIcon) => (evt) => {
+    eventTypeToggler.checked = false;
+
+    eventTypeText.textContent = evt.target.value;
+    eventTypeIcon.src = `img/icons/${evt.target.value}.png`;
+
+    const newOffersComponent = new OffersView([], this.#offers.filter((el) => el.type === evt.target.value));
+    replace(newOffersComponent, this.#offesView);
+    this.#offesView = newOffersComponent;
+  };
+
+  #handleKeydownCloseEdit = (evt) => {
+    if (isEscape(evt)) {
+      this.#switchEditToView();
+    }
+  };
+
+  // -- INIT (-S) -- //
 
   render = () => {
     render(this.#routeView, this.#container);
@@ -127,124 +222,16 @@ export default class RoutePresenter {
     this.#routeViewPackSubscribe();
   };
 
+  // -- MISC -- [init of lib and get options] //
 
-  // getDatepickerOptions = (type) => ({
-  //   defaultDate: this.#route[type],
-  //   enableTime: true,
-  //   // eslint-disable-next-line camelcase
-  //   time_24hr: true,
-  //   dateFormat: 'd/m/y H:i'
-  // });
+  getDatepickerOptions = (type) => ({
+    defaultDate: this.#route[type],
+    enableTime: true,
+    // eslint-disable-next-line camelcase
+    time_24hr: true,
+    dateFormat: 'd/m/y H:i'
+  });
 
-  // initFlatpickr = () => {
-  //   flatpickr(document.querySelector('#event-start-time-1'),
-  //     this.getDatepickerOptions('dateFrom'));
-
-  //   flatpickr(document.querySelector('#event-end-time-1'),
-  //     this.getDatepickerOptions('dateTo'));
-  // };
-
-  // #toggleFavorite = () => {
-
-  //   this.#route.isFavorite = !this.#route.isFavorite;
-  //   const newRouteView = new RouteView({ route: this.#route, allOffers: this.#allOffers
-  //     .filter((item) => item.type === this.#route.type)});
-  //   this.editView = new EditView({ routesEdit: this.#route });
-
-  //   replace(newRouteView, this.routeView);
-  //   this.#state = 'VIEW';
-
-  //   this.routeView = newRouteView;
-  //   this.#rollupSubscribe();
-  // };
-
-  // keydownHandlerClose = (evt) => {
-  //   if (isEscape(evt)) {
-  //     try {
-  //       replace(this.routeView, this.editView);
-  //       this.#state = 'VIEW';
-  //     } catch { /* empty */ }
-  //   }
-
-  //   document.removeEventListener('keydown', this.keydownHandlerClose);
-  // };
-
-  // #editViewSubscribe = () => {
-  //   this.editView.element
-  //     .querySelector('.event__rollup-btn')
-  //     .addEventListener('click', () => {
-  //       try {
-  //         replace(this.routeView, this.editView);
-  //         this.editView.element.querySelector('.event__details').innerHTML = '';
-  //         this.#state = 'VIEW';
-  //       } catch { /* empty */ }
-  //     });
-
-  //   this.routeView.element
-  //     .querySelector('.event__favorite-btn')
-  //     .addEventListener('click', this.#toggleFavorite);
-
-  //   document.addEventListener('keydown', this.keydownHandlerClose);
-  // };
-
-  // #rollupSubscribe () {
-  //   this.routeView.element
-  //     .querySelector('.event__rollup-btn')
-  //     .addEventListener('click', () => {
-  //       try {
-  //         const eventDetails = this.editView.element.querySelector('.event__details');
-  //         const destinationView = new DestionationView(this.#allDestanation.filter((item) => item.name === this.#route.destination)[0].description);
-  //         const destinationPhotoView = new DestionationPhotoView(this.#allDestanation.filter((item) => item.name === this.#route.destination)[0].pictures);
-  //         try {
-  //           replace(this.editView, this.routeView);
-  //           this.initFlatpickr();
-  //           this.#editViewSubscribe();
-  //           this.#state = 'EDIT';
-  //         } catch { /* empty */ }
-  //         eventDetails.innerHTML = '';
-  //         render(destinationView, eventDetails);
-  //         render(destinationPhotoView, eventDetails);
-  //         this.offersView = new offersView({
-  //           selected: this.#route.offers,
-  //           typedAll: this.#allOffers
-  //             .filter((item) => item.type === this.#route.type)
-  //         });
-  //         render(this.offersView, eventDetails, 'afterbegin');
-
-  //         let typeCopy = null;
-
-  //         this.editView.element.querySelector('.event__type-icon').src = `img/icons/${this.#route.type}.png`;
-  //         this.editView.element.querySelector('.event__type-output').textContent = this.#route.type;
-
-  //         this.editView
-  //           .element
-  //           .querySelectorAll('.event__type-input')
-  //           .forEach((item) => {
-  //             if (item.value === this.#route.type) {
-  //               item.checked = true;
-  //             }
-
-  //             item.addEventListener('click', (evt) => {
-  //               document.querySelector('#event-type-toggle-1').checked = false;
-
-  //               this.editView.element.querySelector('.event__type-icon').src = `img/icons/${evt.target.value}.png`;
-  //               this.editView.element.querySelector('.event__type-output').textContent = evt.target.value;
-  //               typeCopy = evt.target.value;
-
-
-  //               if (evt.target.value !== 'sightseeing') {
-  //                 this.offersView.element.remove();
-
-  //                 this.offersView = new offersView({
-  //                   selected: [],
-  //                   typedAll: this.#allOffers.filter((el) => el.type === evt.target.value)
-  //                 });
-  //                 render(this.offersView, this.editView.element.querySelector('.event__details'), 'afterbegin');
-  //               } else {
-  //                 this.offersView.element.remove();
-  //               }
-  //             });
-  //           });
 
   //         this.editView
   //           .element
@@ -265,38 +252,6 @@ export default class RoutePresenter {
 
   //         this.editView
   //           .element
-  //           .querySelector('#event-destination-1')
-  //           .addEventListener('input', (evt) => {
-  //             this.editView.element.querySelector('#event-destination-1').value = evt.target.value;
-
-  //             // for (let i = 0; i < allDestanation.length; i++) {
-  //             //   if (allDestanation[i].name === evt.target.value && allDestanation[i].description !== '') {
-  //             //     if (this.#destionationPhotoView) {
-  //             //       this.#destionationPhotoView.element.remove();
-  //             //     }
-  //             //     if (this.#destionationView) {
-  //             //       this.#destionationView.element.remove();
-  //             //     }
-  //             //     this.#destionationView = new DestionationView(allDestanation[i].description);
-  //             //     render(this.#destionationView, newRouteView.element.querySelector('.event__details'));
-
-  //             //     if (allDestanation[i].pictures.length > 0) {
-  //             //       this.#destionationPhotoView = new DestionationPhotoView(allDestanation[i].pictures);
-  //             //       render(this.#destionationPhotoView, newRouteView.element.querySelector('.event__section--destination'));
-  //             //     }
-  //             //   } else if (allDestanation[i].name === evt.target.value && allDestanation[i].description === '') {
-  //             //     if (this.#destionationPhotoView) {
-  //             //       this.#destionationPhotoView.element.remove();
-  //             //     }
-  //             //     if (this.#destionationView) {
-  //             //       this.#destionationView.element.remove();
-  //             //     }
-  //             //   }
-  //             // }
-  //           });
-
-  //         this.editView
-  //           .element
   //           .querySelector('.event__reset-btn')
   //           .addEventListener('click', (evt) => {
   //             evt.target.textContent = 'Deleting...';
@@ -313,25 +268,4 @@ export default class RoutePresenter {
   //       } catch { /** empty */ }
   //     });
   // }
-
-  // setStateView = () => {
-  //   if (this.#state === 'EDIT') {
-  //     try {
-  //       replace(this.routeView, this.editView);
-  //     } catch { /* empty */ }
-  //     this.#state = 'VIEW';
-  //     this.#rollupSubscribe();
-  //   }
-  // };
-
-  // render = () => {
-  //   this.routeView.element
-  //     .querySelector('.event__favorite-btn')
-  //     .addEventListener('click', this.#toggleFavorite);
-
-  //   render(this.routeView, this.#container);
-  //   this.#rollupSubscribe();
-
-  //   this.#state = 'VIEW';
-  // };
 }

@@ -19,7 +19,7 @@ export default class Presenter {
     this.original = original;
     this.#routes = routes;
     this.#offers = offers;
-    this.#offersView = new offersView({selected: [], typedAll: this.#offers.filter((item) => item.type === 'flight')});
+    this.#offersView = new offersView([], this.#offers.filter((item) => item.type === 'flight'));
     this.#destionationView = false;
     this.#destionationPhotoView = false;
   }
@@ -49,20 +49,20 @@ export default class Presenter {
         }
       });
 
-      const view = new RoutePresenter({ route: item, offers: this.#offers, allDestanation });
+      const view = new RoutePresenter({ route: item, offers: this.#offers, destionations: allDestanation });
       this.routesInstanse.push(view);
 
       view.render();
     });
 
     addEventBtn.addEventListener('click', () => {
-      this.closeAllRoutes();
+      // this.closeAllRoutes();
       const newRouteView = new NewRouteView(this.#offers);
 
       render(newRouteView, document.querySelector('.trip-events__list'), 'afterbegin');
       newRouteView.init();
 
-      this.#offersView = new offersView({selected: [], typedAll: this.#offers.filter((item) => item.type === 'flight')});
+      this.#offersView = new offersView([], this.#offers.filter((item) => item.type === 'flight'));
       render(this.#offersView, newRouteView.element.querySelector('.event__details'));
       const dotsRoutes = newRouteView.element.querySelector('#destination-list-1');
 
@@ -117,10 +117,7 @@ export default class Presenter {
             if (evt.target.value !== 'sightseeing') {
               this.#offersView.element.remove();
 
-              this.#offersView = new offersView({
-                selected: [],
-                typedAll: this.#offers.filter((el) => el.type === evt.target.value)
-              });
+              this.#offersView = new offersView([], this.#offers.filter((el) => el.type === evt.target.value));
               render(this.#offersView, newRouteView.element.querySelector('.event__details'));
             } else {
               this.#offersView.element.remove();

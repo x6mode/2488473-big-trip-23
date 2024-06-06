@@ -11,7 +11,7 @@ function createOffersTemplate(selected, all) {
 
       resultTemplate += `
         <div class="event__offer-selector">
-          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${title}-1" type="checkbox" name="event-offer-${title}" ${selected.includes(id) ? 'checked' : '' }>
+          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${title}-1" type="checkbox" name="event-offer-${title}" ${selected.includes(id) ? 'checked' : '' } data-id=${id}>
           <label class="event__offer-label" for="event-offer-${title}-1">
             <span class="event__offer-title">${title}</span>
             &plus;&euro;&nbsp;
@@ -29,14 +29,16 @@ function createOffersTemplate(selected, all) {
         </div>
       </section>
     `);
+  } else {
+    return '<div></div>';
   }
 }
 
-export default class offersView extends AbstractView {
+export default class OffersView extends AbstractView {
   #selected = null;
   #typedAll = null;
 
-  constructor({ selected, typedAll }) {
+  constructor(selected, typedAll) {
     super();
     this.#selected = selected;
     this.#typedAll = typedAll;
