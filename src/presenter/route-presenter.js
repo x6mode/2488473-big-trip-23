@@ -2,11 +2,13 @@ import RouteView from '../view/point-route';
 import EditView from '../view/edit-point';
 import DestionationView from '../view/destination-legend';
 import { render, replace } from '../framework/render';
-import { isEscape } from '../utils';
+import { isEscape, checkUpdate, getAllOffers } from '../utils';
 import flatpickr from 'flatpickr';
+import dayjs from 'dayjs';
 // import { removeRoute } from '../model/task-api-getter';
 import OffersView from '../view/offers-list';
 import DestionationPhotoView from '../view/destionation-photo';
+import { editRoute } from '../model/task-api-getter';
 
 export default class RoutePresenter {
   #container = document.querySelector('.trip-events__list');
@@ -26,6 +28,7 @@ export default class RoutePresenter {
 
   constructor({ route, offers, destionations }) {
     this.#offers = offers;
+
     this.#destionations = destionations;
 
     this.#route = route;
@@ -70,6 +73,7 @@ export default class RoutePresenter {
     this.#initFlatpickr();
     this.#initOffersChooserSubscribe(container);
     this.#initDestInfoChooserSubscribe(container, thisDestionation);
+    this.#initSaveBtn();
   };
 
   #switchViewToEdit = () => {
@@ -179,8 +183,34 @@ export default class RoutePresenter {
       });
   };
 
+  #initSaveBtn = () => {
+    this.#editView.element
+      .querySelector('.event__save-btn')
+      .addEventListener('click', this.#handleBtnSave);
+  };
+
 
   // -- HANDLERS -- //
+
+  #handleBtnSave = (evt) => {
+    evt.preventDefault();
+
+    const newRoute = {
+      basePrice: Number(this.#editView.element.querySelector('#event-price-1').value),
+      dateFrom: dayjs(this.#editView.element.querySelector('#event-start-time-1')._flatpickr.selectedDates).toJSON(),
+      dateTo: dayjs(this.#editView.element.querySelector('#event-end-time-1')._flatpickr.selectedDates).toJSON(),
+      destination: this.#editView.element.querySelector('#event-destination-1').value,
+      id: this.#route.id,
+      isFavorite: this.#route.isFavorite,
+      type: this.#editView.element.querySelector('.event__type-output').textContent,
+      offers: getAllOffers(this.#editView.element.querySelectorAll('.event__offer-checkbox:checked'))
+    };
+
+    if (!checkUpdate(this.#route, newRoute)) {
+      editRoute(this.#route.id, newRoute, this.#destionations)
+        .then(data => {console.log(data)});
+    }
+  };
 
   #handleInputDestionation = (thisDestionation) => (evt) => {
     thisDestionation = this.#destionations.filter((el) => el.name === evt.target.value)[0];
