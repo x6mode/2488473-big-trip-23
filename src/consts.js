@@ -6,6 +6,6 @@ const timeFormatView = {
 };
 const timeFormatEdit = 'DD/MM/YY HH:mm';
 
-const connectionFields = ['https://23.objects.htmlacademy.pro', 'Basic aerb6Hfwj43C'];
+const connectionFields = ['https://23.objects.htmlacademy.pro', 'Basic aerb6Hfwj73C'];
 
 export { timeFormat as default, timeFormatEdit, connectionFields, timeFormatView };

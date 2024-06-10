@@ -15,18 +15,19 @@ export default class Presenter {
   #destionationPhotoView = null;
   routesInstanse = [];
 
-  constructor({ routes, offers, original }) {
+  constructor({ routes, offers, original, patchFunc }) {
     this.original = original;
     this.#routes = routes;
     this.#offers = offers;
     this.#offersView = new offersView([], this.#offers.filter((item) => item.type === 'flight'));
     this.#destionationView = false;
     this.#destionationPhotoView = false;
+    this.patchFunc = patchFunc;
   }
 
   closeAllRoutes = () => {
     this.routesInstanse.forEach((item) => {
-      item.setStateView();
+      item.closeThisRoute();
     });
   };
 
@@ -49,7 +50,7 @@ export default class Presenter {
         }
       });
 
-      const view = new RoutePresenter({ route: item, offers: this.#offers, destionations: allDestanation });
+      const view = new RoutePresenter({ route: item, offers: this.#offers, destionations: allDestanation, closeAllRouteCb: this.closeAllRoutes, patchFunc: this.patchFunc });
       this.routesInstanse.push(view);
 
       view.render();

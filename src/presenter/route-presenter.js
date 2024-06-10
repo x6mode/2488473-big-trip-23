@@ -8,14 +8,23 @@ import dayjs from 'dayjs';
 // import { removeRoute } from '../model/task-api-getter';
 import OffersView from '../view/offers-list';
 import DestionationPhotoView from '../view/destionation-photo';
-import { editRoute } from '../model/task-api-getter';
+import { editRoute, removeRoute } from '../model/task-api-getter';
+import UiBlocker from '../framework/ui-blocker/ui-blocker';
 
 export default class RoutePresenter {
   #container = document.querySelector('.trip-events__list');
+  #patchFunc = null;
   #state = null;
+
+  #uiBlocker = new UiBlocker({
+    lowerLimit: 350,
+    upperLimit: 1000
+  });
 
   #offers = null;
   #destionations = null;
+
+  #closeAllRoute = null;
 
   #route = null;
 
@@ -26,10 +35,13 @@ export default class RoutePresenter {
   #legendView = null;
   #photoView = null;
 
-  constructor({ route, offers, destionations }) {
-    this.#offers = offers;
+  constructor({ route, offers, destionations, closeAllRouteCb, patchFunc }) {
+    this.#patchFunc = patchFunc;
 
+    this.#offers = offers;
     this.#destionations = destionations;
+
+    this.#closeAllRoute = closeAllRouteCb;
 
     this.#route = route;
 
@@ -65,15 +77,17 @@ export default class RoutePresenter {
   };
 
   #initEditView = () => {
-    const thisDestionation = this.#destionations.filter((el) => el.name === this.#route.destination)[0];
+    const thisDestionation = this.#destionations.filter((el) => el.name === this.#route.destination)[0] || '';
 
     const container = this.#editView.element
       .querySelector('.event__details');
 
     this.#initFlatpickr();
+    this.#insertRealInfo();
     this.#initOffersChooserSubscribe(container);
     this.#initDestInfoChooserSubscribe(container, thisDestionation);
     this.#initSaveBtn();
+    this.#initDeleteBtn();
   };
 
   #switchViewToEdit = () => {
@@ -102,7 +116,6 @@ export default class RoutePresenter {
 
   #toggleFavorite = () => {
     this.#route.isFavorite = !this.#route.isFavorite;
-
     this.#reRenderRouteView();
   };
 
@@ -117,10 +130,10 @@ export default class RoutePresenter {
   };
 
   #openEditViewSubscribe = () => {
-    this.#routeView
-      .element
-      .querySelector('.event__rollup-btn')
-      .addEventListener('click', this.#switchViewToEdit);
+    const rollupBtn = this.#routeView.element.querySelector('.event__rollup-btn');
+
+    rollupBtn.addEventListener('click', this.#closeAllRoute);
+    rollupBtn.addEventListener('click', this.#switchViewToEdit);
   };
 
   #openRouteViewSubscribe = () => {
@@ -140,12 +153,16 @@ export default class RoutePresenter {
       this.getDatepickerOptions('dateTo'));
   };
 
+  #insertRealInfo = () => {
+    this.#editView.element.querySelector('#event-price-1').value = this.#route.basePrice;
+  };
+
   #initDestInfoChooserSubscribe = (container, thisDestionation) => {
 
-    this.#legendView = new DestionationView(thisDestionation.description);
+    this.#legendView = new DestionationView(thisDestionation === '' ? '' : thisDestionation.description);
     render(this.#legendView, container);
 
-    this.#photoView = new DestionationPhotoView(thisDestionation.pictures);
+    this.#photoView = new DestionationPhotoView(thisDestionation === '' ? [] : thisDestionation.pictures);
     render(this.#photoView, container);
 
     const inputEventName = this.#editView.element.querySelector('#event-destination-1');
@@ -189,11 +206,40 @@ export default class RoutePresenter {
       .addEventListener('click', this.#handleBtnSave);
   };
 
+  #initDeleteBtn = () => {
+    this.#editView.element
+      .querySelector('.event__reset-btn')
+      .addEventListener('click', this.#handleBtnDelete);
+  };
 
   // -- HANDLERS -- //
 
+  #handleBtnDelete = (evt) => {
+    evt.preventDefault();
+    evt.target.textContent = 'Deleting...';
+
+    this.#uiBlocker.block();
+
+    removeRoute(this.#route.id)
+      .then((resp) => {
+        if (resp.status === 204) {
+          this.#unMountComponent();
+          this.#patchFunc('DELETE', this.#route.id);
+        }
+      })
+      .catch(() => {
+        this.#editView.shake(() => {
+          evt.target.textContent = 'Delete';
+        });
+      });
+
+    this.#uiBlocker.unblock();
+  };
+
   #handleBtnSave = (evt) => {
     evt.preventDefault();
+
+    const uiBlocker = new UiBlocker(350, 1000);
 
     const newRoute = {
       basePrice: Number(this.#editView.element.querySelector('#event-price-1').value),
@@ -207,8 +253,20 @@ export default class RoutePresenter {
     };
 
     if (!checkUpdate(this.#route, newRoute)) {
+      uiBlocker.block();
       editRoute(this.#route.id, newRoute, this.#destionations)
-        .then(data => {console.log(data)});
+        .then((data) => {
+          console.log(data);
+        });
+
+      uiBlocker.unblock();
+
+      this.#route = newRoute;
+      this.#patchFunc('PATCH', this.#route.id, newRoute);
+      this.#switchEditToView();
+      this.#reRenderRouteView();
+    } else {
+      this.#switchEditToView();
     }
   };
 
@@ -243,6 +301,7 @@ export default class RoutePresenter {
     }
   };
 
+
   // -- INIT (-S) -- //
 
   render = () => {
@@ -252,7 +311,16 @@ export default class RoutePresenter {
     this.#routeViewPackSubscribe();
   };
 
+
   // -- MISC -- [init of lib and get options] //
+
+  #unMountComponent = () => {
+    if (this.#state === 'EDIT') {
+      this.#switchEditToView();
+    }
+
+    this.#routeView.element.remove();
+  };
 
   getDatepickerOptions = (type) => ({
     defaultDate: this.#route[type],
@@ -262,7 +330,13 @@ export default class RoutePresenter {
     dateFormat: 'd/m/y H:i'
   });
 
+  // -- PUBLIC -- //
 
+  closeThisRoute = () => {
+    if (this.#state === 'EDIT') {
+      this.#switchEditToView();
+    }
+  };
   //         this.editView
   //           .element
   //           .querySelector('.event__save-btn')
