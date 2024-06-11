@@ -2,12 +2,9 @@ import AbstractView from '../framework/view/abstract-view.js';
 import timeFormat, { timeFormatView } from '../consts.js';
 import duration from 'dayjs/plugin/duration.js';
 import dayjs from 'dayjs';
+import { getDateDiff } from '../utils.js';
 
 dayjs.extend(duration);
-
-function getDateDiff (dateFrom, dateTo) {
-  return dayjs(dateTo).diff(dateFrom);
-}
 
 function insertCorrectTimeFormatted (dateFrom, dateTo) {
   const date = dayjs.duration(getDateDiff(dateFrom, dateTo));

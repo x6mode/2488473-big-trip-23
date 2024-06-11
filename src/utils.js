@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 
 function getRandomArrayElement(items) {
   return items[Math.floor(Math.random() * items.length)];
@@ -50,4 +51,8 @@ function getAllOffers (nodeList) {
   return result;
 }
 
-export { getRandomArrayElement as default, getRandomNumber, isEscape, checkUpdate, getAllOffers };
+function getDateDiff (dateFrom, dateTo) {
+  return dayjs(dateTo).diff(dateFrom);
+}
+
+export { getRandomArrayElement as default, getRandomNumber, isEscape, checkUpdate, getAllOffers, getDateDiff };

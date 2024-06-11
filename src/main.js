@@ -1,6 +1,6 @@
 import { connectionFields } from './consts.js';
 import Model from './model/first-model.js';
-import FilterPresenter from './presenter/filterPresenter.js';
+import HeadPresenter from './presenter/head-presenter.js';
 
 
 const Modeler = new Model(...connectionFields);
@@ -16,6 +16,6 @@ Modeler
   .then(([offers, destinations, routes]) => {
     document.querySelector('.trip-events__msg').remove();
 
-    const filterPresenter = new FilterPresenter(routes, offers, destinations);
-    filterPresenter.init();
+    const headPresenter = new HeadPresenter(routes, offers, destinations);
+    headPresenter.build();
   });

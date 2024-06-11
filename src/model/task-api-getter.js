@@ -46,7 +46,12 @@ async function removeRoute(ID) {
 
 async function editRoute(ID, newRoute, allDestanation) {
   return await router
-    ._load({url: `big-trip/points/${ID}`, method: 'PUT', body: JSON.stringify(adaptToServer(newRoute, allDestanation))});
+    ._load({
+      url: `big-trip/points/${ID}`,
+      method: 'PUT',
+      body: JSON.stringify(adaptToServer(newRoute, allDestanation)),
+      headers: new Headers({ 'Content-Type': 'application/json' })
+    });
 }
 
 export { getOffers, getDestinations, removeRoute, getRoutes, editRoute };

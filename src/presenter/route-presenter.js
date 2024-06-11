@@ -228,9 +228,8 @@ export default class RoutePresenter {
         }
       })
       .catch(() => {
-        this.#editView.shake(() => {
-          evt.target.textContent = 'Delete';
-        });
+        evt.target.textContent = 'Delete';
+        this.#editView.shake();
       });
 
     this.#uiBlocker.unblock();
@@ -255,16 +254,19 @@ export default class RoutePresenter {
     if (!checkUpdate(this.#route, newRoute)) {
       uiBlocker.block();
       editRoute(this.#route.id, newRoute, this.#destionations)
-        .then((data) => {
-          console.log(data);
+        .then((resp) => {
+          if (resp.ok) {
+            this.#route = newRoute;
+            this.#patchFunc('PATCH', this.#route.id, newRoute);
+            this.#switchEditToView();
+            this.#reRenderRouteView();
+          }
+        })
+        .catch(() => {
+          this.#editView.shake();
         });
-
       uiBlocker.unblock();
 
-      this.#route = newRoute;
-      this.#patchFunc('PATCH', this.#route.id, newRoute);
-      this.#switchEditToView();
-      this.#reRenderRouteView();
     } else {
       this.#switchEditToView();
     }
