@@ -116,7 +116,16 @@ export default class RoutePresenter {
 
   #toggleFavorite = () => {
     this.#route.isFavorite = !this.#route.isFavorite;
-    this.#reRenderRouteView();
+
+    editRoute(this.#route.id, this.#route, this.#destionations)
+      .then(() => {
+        this.#patchFunc('PATCH', this.#route.id, this.#route);
+        this.#reRenderRouteView();
+      })
+      .catch(() => {
+        this.#routeView.shake();
+        this.#route.isFavorite = !this.#route.isFavorite;
+      });
   };
 
 
@@ -339,39 +348,4 @@ export default class RoutePresenter {
       this.#switchEditToView();
     }
   };
-  //         this.editView
-  //           .element
-  //           .querySelector('.event__save-btn')
-  //           .addEventListener('click', (evt) => {
-  //             evt.preventDefault();
-  //             try {
-  //               this.offersView.element.remove();
-  //               this.#route.type = typeCopy;
-  //               this.routeView = new RouteView({ route: this.#route, allOffers: this.#allOffers
-  //                 .filter((item) => item.type === this.#route.type) });
-  //               replace(this.routeView, this.editView);
-  //               this.#rollupSubscribe();
-  //               this.editView.element.querySelector('.event__details').innerHTML = '';
-  //               this.#state = 'VIEW';
-  //             } catch { /* empty */ }
-  //           });
-
-  //         this.editView
-  //           .element
-  //           .querySelector('.event__reset-btn')
-  //           .addEventListener('click', (evt) => {
-  //             evt.target.textContent = 'Deleting...';
-  //             removeRoute(this.#route.id)
-  //               .then((data) => {
-  //                 if (data.status === 204) {
-  //                   this.editView.element.remove();
-  //                   document.removeEventListener('keydown', this.keydownHandlerClose);
-  //                 }
-  //               })
-  //               .catch(() => this.editView.shake(() => {}));
-  //           });
-  //         this.#state = 'EDIT';
-  //       } catch { /** empty */ }
-  //     });
-  // }
 }

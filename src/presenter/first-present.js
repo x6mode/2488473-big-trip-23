@@ -12,6 +12,12 @@ export default class Presenter {
   }
 
   closeAllRoutes = () => {
+    const newRouteView = document.querySelector('.trip-events__item-new');
+    if (newRouteView) {
+      newRouteView.remove();
+      document.querySelector('.trip-main__event-add-btn').disabled = false;
+    }
+
     this.routesInstanse.forEach((item) => {
       item.closeThisRoute();
     });
