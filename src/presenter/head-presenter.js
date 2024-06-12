@@ -180,7 +180,7 @@ export default class HeadPresenter {
   };
 
   #initOffersChooserSubscribe = (container, component) => {
-    this.#offesViewNR = new OffersView([], [{offers: []}]);
+    this.#offesViewNR = new OffersView([], this.#offers.filter((el) => el.type === 'flight'));
     render(this.#offesViewNR, container);
 
     const eventTypeToggler = component.element.querySelector('.event__type-toggle');
