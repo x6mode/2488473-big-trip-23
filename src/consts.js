@@ -18,7 +18,7 @@ const filterFuncs = {
 };
 
 const sortFuncs = {
-  'sort-day': (routeA, routeB) => new Date(routeB.dateTo) - new Date(routeA.dateTo),
+  'sort-day': (routeA, routeB) => new Date(routeA.dateTo) - new Date(routeB.dateTo),
   'sort-time': (routeA, routeB) => getDateDiff(routeB.dateFrom, routeB.dateTo) - getDateDiff(routeA.dateFrom, routeA.dateTo),
   'sort-price': (routeA, routeB) => routeB.basePrice - routeA.basePrice,
 };

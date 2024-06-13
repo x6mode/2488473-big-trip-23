@@ -107,7 +107,7 @@ export default class HeadPresenter {
     filterView.element
       .querySelectorAll('.trip-filters__filter-input')
       .forEach((node) => {
-        if (this.#_original.slice().reverse().filter(filterFuncs[node.value]).length === 0) {
+        if (this.#_original.slice().filter(filterFuncs[node.value]).length === 0) {
           node.disabled = true;
         }
         node.addEventListener('click', this.#handleFilterClick);
@@ -272,7 +272,7 @@ export default class HeadPresenter {
     this.#buildFilter();
     this.#buildSort();
 
-    this.#buildAllRoutes(this.#routes.slice().reverse());
+    this.#buildAllRoutes(this.#routes.slice());
 
     this.#buildBtnCreateRoute();
   }
