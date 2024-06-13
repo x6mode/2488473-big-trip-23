@@ -1,5 +1,6 @@
 import TopFrame from '../view/top-frame';
 import { render } from '../framework/render';
+import UiBlocker from '../framework/ui-blocker/ui-blocker';
 import FilterView from '../view/list-filter';
 import SortView from '../view/list-sort';
 import NewRouteView from '../view/new-point';
@@ -29,6 +30,13 @@ export default class HeadPresenter {
 
   #routeInstanse = [];
 
+  #uiBlocker = new UiBlocker({
+    lowerLimit: 0,
+    upperLimit: 1000
+  });
+
+  #topFrame = null;
+
   constructor(routes, offers, destinations) {
     this.#_original = routes;
     this.#routes = this.#_original.slice();
@@ -47,6 +55,7 @@ export default class HeadPresenter {
       this.#_original.map((item, index) => {
         if (item.id === ID) {
           this.#_original[index] = newInfo;
+          this.#changeTotalPrice();
         }
       });
     } else if (type === 'DELETE') {
@@ -58,16 +67,24 @@ export default class HeadPresenter {
       this.#_original.map((item, index) => {
         if (item.id === ID) {
           delete this.#_original[index];
+          this.#changeTotalPrice();
         }
       });
     } else if (type === 'CREATE') {
       this.#routes.push(newInfo);
       this.#_original.push(newInfo);
+      this.#changeTotalPrice();
     }
   };
 
   #clearLastRoutesPresenter = () => {
     document.querySelector('.trip-events__list').innerHTML = '';
+  };
+
+  #changeTotalPrice = () => {
+    this.#topFrame.element
+      .querySelector('.trip-info__cost-value')
+      .textContent = this.#_original.reduce((currentSum, item) => currentSum + item.basePrice, 0);
   };
 
 
@@ -92,12 +109,12 @@ export default class HeadPresenter {
   // -- BUILDERS -- //
 
   #buildTopFrame = () => {
-    const topFrame = new TopFrame({
+    this.#topFrame = new TopFrame({
       allRoutes: this.#routes,
       allDestanation: this.#destinations
     });
 
-    render(topFrame, document.querySelector('.trip-main'), 'afterbegin');
+    render(this.#topFrame, document.querySelector('.trip-main'), 'afterbegin');
   };
 
   #buildFilter = () => {
@@ -131,7 +148,8 @@ export default class HeadPresenter {
     const routesPresenter = new Presenter({
       routes: routes,
       offers: this.#offers,
-      patchFunc: this.#patchRoute
+      patchFunc: this.#patchRoute,
+      uiBlocker: this.#uiBlocker
     });
 
     routesPresenter.init(this.#destinations);

@@ -5,10 +5,11 @@ export default class Presenter {
   #offers = null;
   routesInstanse = [];
 
-  constructor({ routes, offers, patchFunc }) {
+  constructor({ routes, offers, patchFunc, uiBlocker }) {
     this.#routes = routes;
     this.#offers = offers;
     this.patchFunc = patchFunc;
+    this.uiBlocker = uiBlocker;
   }
 
   closeAllRoutes = () => {
@@ -31,7 +32,7 @@ export default class Presenter {
         }
       });
 
-      const view = new RoutePresenter({ route: item, offers: this.#offers, destionations: allDestanation, closeAllRouteCb: this.closeAllRoutes, patchFunc: this.patchFunc });
+      const view = new RoutePresenter({ route: item, offers: this.#offers, destionations: allDestanation, closeAllRouteCb: this.closeAllRoutes, patchFunc: this.patchFunc, uiBlocker: this.uiBlocker });
       this.routesInstanse.push(view);
 
       view.render();

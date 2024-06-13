@@ -9,17 +9,13 @@ import dayjs from 'dayjs';
 import OffersView from '../view/offers-list';
 import DestionationPhotoView from '../view/destionation-photo';
 import { editRoute, removeRoute } from '../model/task-api-getter';
-import UiBlocker from '../framework/ui-blocker/ui-blocker';
 
 export default class RoutePresenter {
   #container = document.querySelector('.trip-events__list');
   #patchFunc = null;
   #state = null;
 
-  #uiBlocker = new UiBlocker({
-    lowerLimit: 350,
-    upperLimit: 1000
-  });
+  #uiBlocker = null;
 
   #offers = null;
   #destionations = null;
@@ -35,8 +31,9 @@ export default class RoutePresenter {
   #legendView = null;
   #photoView = null;
 
-  constructor({ route, offers, destionations, closeAllRouteCb, patchFunc }) {
+  constructor({ route, offers, destionations, closeAllRouteCb, patchFunc, uiBlocker }) {
     this.#patchFunc = patchFunc;
+    this.#uiBlocker = uiBlocker;
 
     this.#offers = offers;
     this.#destionations = destionations;
@@ -247,8 +244,6 @@ export default class RoutePresenter {
   #handleBtnSave = (evt) => {
     evt.preventDefault();
 
-    const uiBlocker = new UiBlocker(350, 1000);
-
     const newRoute = {
       basePrice: Number(this.#editView.element.querySelector('#event-price-1').value),
       dateFrom: dayjs(this.#editView.element.querySelector('#event-start-time-1')._flatpickr.selectedDates).toJSON(),
@@ -261,7 +256,7 @@ export default class RoutePresenter {
     };
 
     if (!checkUpdate(this.#route, newRoute)) {
-      uiBlocker.block();
+      this.#uiBlocker.block();
       editRoute(this.#route.id, newRoute, this.#destionations)
         .then((resp) => {
           if (resp.ok) {
@@ -274,7 +269,7 @@ export default class RoutePresenter {
         .catch(() => {
           this.#editView.shake();
         });
-      uiBlocker.unblock();
+      this.#uiBlocker.unblock();
 
     } else {
       this.#switchEditToView();
