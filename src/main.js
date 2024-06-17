@@ -1,9 +1,9 @@
-import { connectionFields } from './consts.js';
+import { ConnectionField } from './consts.js';
 import Model from './model/first-model.js';
 import HeadPresenter from './presenter/head-presenter.js';
 // hooked--listener
 
-const Modeler = new Model(...connectionFields);
+const Modeler = new Model(...ConnectionField);
 
 document.querySelector('.trip-main__event-add-btn').disabled = true;
 

@@ -1,26 +1,26 @@
 import { getDateDiff } from './utils';
 
-const timeFormat = 'HH:mm';
-const timeFormatView = {
-  minutly: 'mm[M]',
-  hourly: 'HH[H] mm[M]',
-  dayly: 'DD[D] HH[H] mm[M]'
+const TimeFormat = 'HH:mm';
+const TimeFormatView = {
+  MINUTLY: 'mm[M]',
+  HOURLY: 'HH[H] mm[M]',
+  DAYLY: 'DD[D] HH[H] mm[M]'
 };
-const timeFormatEdit = 'DD/MM/YY HH:mm';
+const TimeFormatEdit = 'DD/MM/YY HH:mm';
 
-const connectionFields = ['https://23.objects.htmlacademy.pro', 'Basic aesadffdasf6Hfwj73C'];
+const ConnectionField = ['https://23.objects.htmlacademy.pro', 'Basic aesadffdasf6Hfwj73C'];
 
-const filterFunc = {
+const FilterFunc = {
   EVERYTHING: () => true,
   FUTURE: (item) => new Date(item.dateFrom) > new Date(),
   PRESENT: (item) => new Date(item.dateFrom) <= new Date() && new Date(item.dateTo) >= new Date(),
   PAST: (item) => new Date(item.dateTo) < new Date()
 };
 
-const sortFunc = {
-  'sort-day': (routeA, routeB) => new Date(routeA.dateTo) - new Date(routeB.dateTo),
-  'sort-time': (routeA, routeB) => getDateDiff(routeB.dateFrom, routeB.dateTo) - getDateDiff(routeA.dateFrom, routeA.dateTo),
-  'sort-price': (routeA, routeB) => routeB.basePrice - routeA.basePrice,
+const SortFunc = {
+  DAY: (routeA, routeB) => new Date(routeA.dateTo) - new Date(routeB.dateTo),
+  TIME: (routeA, routeB) => getDateDiff(routeB.dateFrom, routeB.dateTo) - getDateDiff(routeA.dateFrom, routeA.dateTo),
+  PRICE: (routeA, routeB) => routeB.basePrice - routeA.basePrice,
 };
 
-export { timeFormat as default, timeFormatEdit, connectionFields, timeFormatView, filterFunc, sortFunc };
+export { TimeFormat as default, TimeFormatEdit, ConnectionField, TimeFormatView, FilterFunc, SortFunc };

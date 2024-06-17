@@ -8,7 +8,7 @@ import DestinationPhotoView from '../view/destination-photo';
 import DestinationView from '../view/destination-legend';
 import OffersView from '../view/offers-list';
 import Presenter from './first-present';
-import { filterFunc, sortFunc } from '../consts';
+import { FilterFunc, SortFunc } from '../consts';
 import dayjs from 'dayjs';
 import { getAllOffers } from '../utils';
 import { createRoute } from '../model/task-api-getter';
@@ -21,8 +21,8 @@ export default class HeadPresenter {
   #destinations = null;
   #_original = null;
 
-  #_sort = 'sort-day';
-  #_filter = 'everything';
+  #_sort = 'DAY';
+  #_filter = 'EVERYTHING';
 
   #offersViewNR = null;
   #legendViewNR = null;
@@ -101,12 +101,12 @@ export default class HeadPresenter {
     this.#clearLastRoutesPresenter();
     evt.target.checked = true;
     this.currentSort = evt.target.value;
-    this.#buildAllRoutes(this.#routes.slice().sort(sortFunc[evt.target.value]));
+    this.#buildAllRoutes(this.#routes.slice().sort(SortFunc[evt.target.value]));
   };
 
   #handleFilterClick = (evt) => {
     document.querySelector('#sort-day').checked = true;
-    this.#routes = this.#_original.slice().reverse().filter(filterFunc[evt.target.value]);
+    this.#routes = this.#_original.slice().reverse().filter(FilterFunc[evt.target.value.toUpperCase()]);
     document.querySelector('.trip-main__event-add-btn').disabled = false;
     this.#clearLastRoutesPresenter();
     this.#buildAllRoutes(this.#routes);
@@ -127,7 +127,7 @@ export default class HeadPresenter {
     this.#filterView.element
       .querySelectorAll('.trip-filters__filter-input')
       .forEach((node) => {
-        if (this.#_original.slice().filter(filterFunc[node.value.toUpperCase()]).length === 0) {
+        if (this.#_original.slice().filter(FilterFunc[node.value.toUpperCase()]).length === 0) {
           node.disabled = true;
         }
       });
@@ -139,7 +139,7 @@ export default class HeadPresenter {
     this.#filterView.element
       .querySelectorAll('.trip-filters__filter-input')
       .forEach((node) => {
-        if (this.#_original.slice().filter(filterFunc[node.value.toUpperCase()]).length === 0) {
+        if (this.#_original.slice().filter(FilterFunc[node.value.toUpperCase()]).length === 0) {
           node.disabled = true;
         }
         node.addEventListener('click', this.#handleFilterClick);
@@ -288,8 +288,8 @@ export default class HeadPresenter {
               this.#buildAllRoutes(
                 this.#_original
                   .slice()
-                  .filter(filterFunc[this.#_filter.toUpperCase()])
-                  .sort(sortFunc[this.#_sort]
+                  .filter(FilterFunc[this.#_filter.toUpperCase()])
+                  .sort(SortFunc[this.#_sort.toUpperCase()]
                   ));
               addEventBtn.disabled = false;
             })

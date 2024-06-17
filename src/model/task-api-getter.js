@@ -1,8 +1,8 @@
 /* eslint-disable camelcase */
 import ApiService from '../framework/api-service';
-import { connectionFields } from '../consts';
+import { ConnectionField } from '../consts';
 
-const router = new ApiService(...connectionFields);
+const router = new ApiService(...ConnectionField);
 
 function adaptToServer (route, allDestination) {
   const adaptedRoute = {
