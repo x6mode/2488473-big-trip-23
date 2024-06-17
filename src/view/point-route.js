@@ -9,14 +9,14 @@ dayjs.extend(duration);
 function insertCorrectTimeFormatted (dateFrom, dateTo) {
   const date = dayjs.duration(getDateDiff(dateFrom, dateTo));
   if (date.days()) {
-    return date.format(TimeFormatView.DAYLY);
+    return date.format(TimeFormatView.DAY);
   }
 
   if (date.hours()) {
-    return date.format(TimeFormatView.HOURLY);
+    return date.format(TimeFormatView.HOUR);
   }
 
-  return date.format(TimeFormatView.MINUTLY);
+  return date.format(TimeFormatView.MINUTE);
 }
 
 function createRouteOffersTemplate(selected, all) {

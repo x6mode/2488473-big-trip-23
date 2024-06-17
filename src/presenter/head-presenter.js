@@ -100,8 +100,8 @@ export default class HeadPresenter {
     document.querySelector('.trip-main__event-add-btn').disabled = false;
     this.#clearLastRoutesPresenter();
     evt.target.checked = true;
-    this.currentSort = evt.target.value;
-    this.#buildAllRoutes(this.#routes.slice().sort(SortFunc[evt.target.value]));
+    this.currentSort = evt.target.value.toUpperCase();
+    this.#buildAllRoutes(this.#routes.slice().sort(SortFunc[evt.target.value.toUpperCase()]));
   };
 
   #handleFilterClick = (evt) => {

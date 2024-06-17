@@ -2,9 +2,9 @@ import { getDateDiff } from './utils';
 
 const TimeFormat = 'HH:mm';
 const TimeFormatView = {
-  MINUTLY: 'mm[M]',
-  HOURLY: 'HH[H] mm[M]',
-  DAYLY: 'DD[D] HH[H] mm[M]'
+  MINUTE: 'mm[M]',
+  HOUR: 'HH[H] mm[M]',
+  DAY: 'DD[D] HH[H] mm[M]'
 };
 const TimeFormatEdit = 'DD/MM/YY HH:mm';
 
