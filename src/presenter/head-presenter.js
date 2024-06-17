@@ -262,7 +262,7 @@ export default class HeadPresenter {
             dateTo: dayjs(newRouteView.element.querySelector('#event-end-time-1')._flatpickr.selectedDates).toJSON(),
             destination: newRouteView.element.querySelector('#event-destination-1').value,
             isFavorite: false,
-            type: newRouteView.element.querySelector('.event__type-output').textContent,
+            type: newRouteView.element.querySelector('.event__type-output').textContent.toLowerCase(),
             offers: getAllOffers(newRouteView.element.querySelectorAll('.event__offer-checkbox:checked'))
           };
 
@@ -276,6 +276,7 @@ export default class HeadPresenter {
                   .filter(filterFuncs[this.#_filter])
                   .sort(sortFuncs[this.#_sort]
                   ));
+              addEventBtn.disabled = false;
             })
             .catch(() => {
               newRouteView.shake();
