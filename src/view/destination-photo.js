@@ -22,7 +22,7 @@ function createPhotoTemplate (array) {
   }
 }
 
-export default class DestionationPhotoView extends AbstractView {
+export default class DestinationPhotoView extends AbstractView {
   #photos = null;
 
   constructor(photos) {

@@ -35,12 +35,12 @@ export default class TopFrame extends AbstractView {
   #cost = null;
   #datesTo = null;
   #datesFrom = null;
-  #destionation = null;
+  #destination = null;
 
-  constructor({ allRoutes, allDestanation }) {
+  constructor({ allRoutes, allDestination }) {
     super();
     this.#cost = allRoutes.reduce((currentSum, item) => currentSum + item.basePrice, 0);
-    this.#destionation = allDestanation.map((item) => item.name);
+    this.#destination = allDestination.map((item) => item.name);
     this.#datesTo = this.#unpackDate(allRoutes, 'dateTo');
     this.#datesFrom = this.#unpackDate(allRoutes, 'dateFrom');
   }
@@ -50,7 +50,7 @@ export default class TopFrame extends AbstractView {
   }
 
   get template() {
-    return createTopFrameTemplate(this.#cost, this.#destionation, {
+    return createTopFrameTemplate(this.#cost, this.#destination, {
       dateFrom: this.#datesFrom,
       dateTo: this.#datesTo
     });

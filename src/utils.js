@@ -29,7 +29,7 @@ function checkArrayUpdate(prevRoute, newRoute) {
   return false;
 }
 
-function checkUpdate(prevRoute, newRoute) { // -> retrun true if arrays equals
+function checkUpdate(prevRoute, newRoute) {
   return (
     prevRoute.basePrice === newRoute.basePrice &&
     prevRoute.dateFrom.slice(0, -5) === newRoute.dateFrom.slice(0, -5) &&

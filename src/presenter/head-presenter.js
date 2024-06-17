@@ -4,11 +4,11 @@ import UiBlocker from '../framework/ui-blocker/ui-blocker';
 import FilterView from '../view/list-filter';
 import SortView from '../view/list-sort';
 import NewRouteView from '../view/new-point';
-import DestionationPhotoView from '../view/destionation-photo';
-import DestionationView from '../view/destination-legend';
+import DestinationPhotoView from '../view/destination-photo';
+import DestinationView from '../view/destination-legend';
 import OffersView from '../view/offers-list';
 import Presenter from './first-present';
-import { filterFuncs, sortFuncs } from '../consts';
+import { filterFunc, sortFunc } from '../consts';
 import dayjs from 'dayjs';
 import { getAllOffers } from '../utils';
 import { createRoute } from '../model/task-api-getter';
@@ -24,11 +24,13 @@ export default class HeadPresenter {
   #_sort = 'sort-day';
   #_filter = 'everything';
 
-  #offesViewNR = null;
+  #offersViewNR = null;
   #legendViewNR = null;
   #photoViewNR = null;
 
   #routeInstanse = [];
+
+  #filterView = null;
 
   #uiBlocker = new UiBlocker({
     lowerLimit: 0,
@@ -43,6 +45,7 @@ export default class HeadPresenter {
     this.#offers = offers;
     this.#destinations = destinations;
     this.routerInstanse = null;
+    this.#filterView = new FilterView();
   }
 
   #patchRoute = (type, ID = null, newInfo = null) => {
@@ -56,6 +59,7 @@ export default class HeadPresenter {
         if (item.id === ID) {
           this.#_original[index] = newInfo;
           this.#changeTotalPrice();
+          this.#deactivateFilter();
         }
       });
     } else if (type === 'DELETE') {
@@ -68,12 +72,14 @@ export default class HeadPresenter {
         if (item.id === ID) {
           delete this.#_original[index];
           this.#changeTotalPrice();
+          this.#deactivateFilter();
         }
       });
     } else if (type === 'CREATE') {
       this.#routes.push(newInfo);
       this.#_original.push(newInfo);
       this.#changeTotalPrice();
+      this.#deactivateFilter();
     }
   };
 
@@ -95,12 +101,12 @@ export default class HeadPresenter {
     this.#clearLastRoutesPresenter();
     evt.target.checked = true;
     this.currentSort = evt.target.value;
-    this.#buildAllRoutes(this.#routes.slice().sort(sortFuncs[evt.target.value]));
+    this.#buildAllRoutes(this.#routes.slice().sort(sortFunc[evt.target.value]));
   };
 
   #handleFilterClick = (evt) => {
     document.querySelector('#sort-day').checked = true;
-    this.#routes = this.#_original.slice().reverse().filter(filterFuncs[evt.target.value]);
+    this.#routes = this.#_original.slice().reverse().filter(filterFunc[evt.target.value]);
     document.querySelector('.trip-main__event-add-btn').disabled = false;
     this.#clearLastRoutesPresenter();
     this.#buildAllRoutes(this.#routes);
@@ -111,20 +117,29 @@ export default class HeadPresenter {
   #buildTopFrame = () => {
     this.#topFrame = new TopFrame({
       allRoutes: this.#routes,
-      allDestanation: this.#destinations
+      allDestination: this.#destinations
     });
 
     render(this.#topFrame, document.querySelector('.trip-main'), 'afterbegin');
   };
 
-  #buildFilter = () => {
-    const filterView = new FilterView();
-    render(filterView, document.querySelector('.trip-controls'));
-
-    filterView.element
+  #deactivateFilter = () => {
+    this.#filterView.element
       .querySelectorAll('.trip-filters__filter-input')
       .forEach((node) => {
-        if (this.#_original.slice().filter(filterFuncs[node.value]).length === 0) {
+        if (this.#_original.slice().filter(filterFunc[node.value.toUpperCase()]).length === 0) {
+          node.disabled = true;
+        }
+      });
+  };
+
+  #buildFilter = () => {
+    render(this.#filterView, document.querySelector('.trip-controls'));
+
+    this.#filterView.element
+      .querySelectorAll('.trip-filters__filter-input')
+      .forEach((node) => {
+        if (this.#_original.slice().filter(filterFunc[node.value.toUpperCase()]).length === 0) {
           node.disabled = true;
         }
         node.addEventListener('click', this.#handleFilterClick);
@@ -157,15 +172,15 @@ export default class HeadPresenter {
   };
 
 
-  #handleInputDestionation = (thisDestionation) => (evt) => {
-    thisDestionation = this.#destinations.filter((el) => el.name === evt.target.value)[0];
+  #handleInputDestination = (thisDestination) => (evt) => {
+    thisDestination = this.#destinations.filter((el) => el.name === evt.target.value)[0];
 
-    if (typeof thisDestionation !== 'undefined') {
-      const newLegendComponent = new DestionationView(thisDestionation.description);
+    if (typeof thisDestination !== 'undefined') {
+      const newLegendComponent = new DestinationView(thisDestination.description);
       replace(newLegendComponent, this.#legendViewNR);
       this.#legendViewNR = newLegendComponent;
 
-      const newPhotoComponent = new DestionationPhotoView(thisDestionation.pictures);
+      const newPhotoComponent = new DestinationPhotoView(thisDestination.pictures);
       replace(newPhotoComponent, this.#photoViewNR);
       this.#photoViewNR = newPhotoComponent;
     }
@@ -193,13 +208,13 @@ export default class HeadPresenter {
     eventTypeIcon.src = `img/icons/${evt.target.value}.png`;
 
     const newOffersComponent = new OffersView([], this.#offers.filter((el) => el.type === evt.target.value));
-    replace(newOffersComponent, this.#offesViewNR);
-    this.#offesViewNR = newOffersComponent;
+    replace(newOffersComponent, this.#offersViewNR);
+    this.#offersViewNR = newOffersComponent;
   };
 
   #initOffersChooserSubscribe = (container, component) => {
-    this.#offesViewNR = new OffersView([], this.#offers.filter((el) => el.type === 'flight'));
-    render(this.#offesViewNR, container);
+    this.#offersViewNR = new OffersView([], this.#offers.filter((el) => el.type === 'flight'));
+    render(this.#offersViewNR, container);
 
     const eventTypeToggler = component.element.querySelector('.event__type-toggle');
     const eventTypeText = component.element.querySelector('.event__type-output');
@@ -213,12 +228,12 @@ export default class HeadPresenter {
       });
   };
 
-  #initDestInfoChooserSubscribe = (container, thisDestionation, component) => {
+  #initDestInfoChooserSubscribe = (container, thisDestination, component) => {
 
-    this.#legendViewNR = new DestionationView(thisDestionation === '' ? '' : thisDestionation.description);
+    this.#legendViewNR = new DestinationView(thisDestination === '' ? '' : thisDestination.description);
     render(this.#legendViewNR, container);
 
-    this.#photoViewNR = new DestionationPhotoView(thisDestionation === '' ? [] : thisDestionation.pictures);
+    this.#photoViewNR = new DestinationPhotoView(thisDestination === '' ? [] : thisDestination.pictures);
     render(this.#photoViewNR, container);
 
     const inputEventName = component.element.querySelector('#event-destination-1');
@@ -230,7 +245,7 @@ export default class HeadPresenter {
       datalistContainer.innerHTML += `<option value='${item.name}'></option>`;
     });
 
-    inputEventName.addEventListener('input', this.#handleInputDestionation(thisDestionation));
+    inputEventName.addEventListener('input', this.#handleInputDestination(thisDestination));
   };
 
   #buildBtnCreateRoute = () => {
@@ -273,8 +288,8 @@ export default class HeadPresenter {
               this.#buildAllRoutes(
                 this.#_original
                   .slice()
-                  .filter(filterFuncs[this.#_filter])
-                  .sort(sortFuncs[this.#_sort]
+                  .filter(filterFunc[this.#_filter.toUpperCase()])
+                  .sort(sortFunc[this.#_sort]
                   ));
               addEventBtn.disabled = false;
             })
