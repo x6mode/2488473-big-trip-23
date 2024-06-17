@@ -127,11 +127,11 @@ export default class NewRouteView extends AbstractView {
     const elem = document.querySelector('.trip-events__item-new');
     const elemCostInput = elem.querySelector('#event-price-1');
 
-    const elemDestantionInput = elem.querySelector('#event-destination-1');
+    const elemDestinationInput = elem.querySelector('#event-destination-1');
     const elemDateStart = elem.querySelector('#event-start-time-1');
     const elemDateEnd = elem.querySelector('#event-end-time-1');
 
-    [elemDestantionInput, elemDateStart, elemDateEnd].forEach((item) => {
+    [elemDestinationInput, elemDateStart, elemDateEnd].forEach((item) => {
       item.value = '';
     });
 

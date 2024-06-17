@@ -3,7 +3,7 @@ import RoutePresenter from './route-presenter.js';
 export default class Presenter {
   #routes = null;
   #offers = null;
-  routesInstanse = [];
+  routesInstance = [];
 
   constructor({ routes, offers, patchFunc, uiBlocker }) {
     this.#routes = routes;
@@ -19,7 +19,7 @@ export default class Presenter {
       document.querySelector('.trip-main__event-add-btn').disabled = false;
     }
 
-    this.routesInstanse.forEach((item) => {
+    this.routesInstance.forEach((item) => {
       item.closeThisRoute();
     });
   };
@@ -33,7 +33,7 @@ export default class Presenter {
       });
 
       const view = new RoutePresenter({ route: item, offers: this.#offers, destinations: allDestination, closeAllRouteCb: this.closeAllRoutes, patchFunc: this.patchFunc, uiBlocker: this.uiBlocker });
-      this.routesInstanse.push(view);
+      this.routesInstance.push(view);
 
       view.render();
     });
