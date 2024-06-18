@@ -28,7 +28,7 @@ export default class HeadPresenter {
   #legendViewNR = null;
   #photoViewNR = null;
 
-  #routeInstanse = [];
+  #routeInstance = [];
 
   #filterView = null;
 
@@ -44,7 +44,7 @@ export default class HeadPresenter {
     this.#routes = this.#_original.slice();
     this.#offers = offers;
     this.#destinations = destinations;
-    this.routerInstanse = null;
+    this.routerInstance = null;
     this.#filterView = new FilterView();
   }
 
@@ -168,7 +168,7 @@ export default class HeadPresenter {
     });
 
     routesPresenter.init(this.#destinations);
-    this.routerInstanse = routesPresenter;
+    this.routerInstance = routesPresenter;
   };
 
 
@@ -253,7 +253,7 @@ export default class HeadPresenter {
     addEventBtn.disabled = false;
 
     addEventBtn.addEventListener('click', () => {
-      this.routerInstanse.closeAllRoutes();
+      this.routerInstance.closeAllRoutes();
       const newRouteView = new NewRouteView(this.#offers);
 
       const container = newRouteView.element

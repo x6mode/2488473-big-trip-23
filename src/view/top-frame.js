@@ -1,21 +1,33 @@
 import dayjs from 'dayjs';
 import AbstractView from '../framework/view/abstract-view.js';
 
+function getHeaderRow (destinations) {
+  if (!destinations || !destinations.length) {
+    return '';
+  }
+
+  if (destinations.length === 1) {
+    return destinations[0];
+  }
+
+  if (destinations.length === 2) {
+    return `${destinations[0]} - ${destinations[1]}`;
+  }
+
+  const first = destinations[0];
+  const middle = destinations.slice(1, -1);
+  const last = destinations.at(-1);
+
+  return `${first} - ${middle.length === 1 ? middle[0] : '...'} - ${last}`;
+}
+
 function createTopFrameTemplate (cost, destination, dates) {
 
   const format = 'DD MMM';
   const firstDate = dayjs(dates.dateFrom[0]).format(format);
   const lastDate = dayjs(dates.dateTo[dates.dateTo.length - 1]).format(format);
 
-  let formattedTitle = '';
-
-  if (destination.length > 2) {
-    formattedTitle = `${destination[0]} - ... - ${destination[destination.length - 1]}`;
-  } else if (destination.length > 1) {
-    formattedTitle = `${destination[0]} - ${destination[1]}`;
-  } else {
-    formattedTitle = 'Точек нету :(';
-  }
+  const formattedTitle = getHeaderRow(destination);
 
   return `
   <section class="trip-main__trip-info  trip-info">
