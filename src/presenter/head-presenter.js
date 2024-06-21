@@ -1,12 +1,12 @@
 import TopFrame from '../view/top-frame';
 import { render } from '../framework/render';
 import UiBlocker from '../framework/ui-blocker/ui-blocker';
-import FilterView from '../view/list-filter';
-import SortView from '../view/list-sort';
-import NewRouteView from '../view/new-point';
-import DestinationPhotoView from '../view/destination-photo';
-import DestinationView from '../view/destination-legend';
-import OffersView from '../view/offers-list';
+import FilterView from '../view/filter-view';
+import SortView from '../view/sort-view';
+import NewRouteView from '../view/new-route-view';
+import DestinationPhotoView from '../view/destination-photo-view';
+import DestinationView from '../view/destination-legend-view';
+import OffersView from '../view/offers-view';
 import Presenter from './first-present';
 import { FilterFunc, SortFunc } from '../consts';
 import dayjs from 'dayjs';

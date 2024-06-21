@@ -1,13 +1,12 @@
-import RouteView from '../view/point-route';
-import EditView from '../view/edit-point';
-import DestinationView from '../view/destination-legend';
+import RouteView from '../view/route-view';
+import EditView from '../view/edit-route-view';
+import DestinationView from '../view/destination-legend-view';
 import { render, replace } from '../framework/render';
 import { isEscape, checkUpdate, getAllOffers } from '../utils';
 import flatpickr from 'flatpickr';
 import dayjs from 'dayjs';
-// import { removeRoute } from '../model/task-api-getter';
-import OffersView from '../view/offers-list';
-import DestinationPhotoView from '../view/destination-photo';
+import OffersView from '../view/offers-view';
+import DestinationPhotoView from '../view/destination-photo-view';
 import { editRoute, removeRoute } from '../model/task-api-getter';
 
 export default class RoutePresenter {
