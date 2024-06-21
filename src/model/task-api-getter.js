@@ -61,7 +61,8 @@ async function createRoute(newRoute, allDestination) {
       method: 'POST',
       body: JSON.stringify(adaptToServer(newRoute, allDestination)),
       headers: new Headers({ 'Content-Type': 'application/json' })
-    });
+    })
+    .then(ApiService.parseResponse);
 }
 
 export { getOffers, getDestinations, removeRoute, getRoutes, editRoute, createRoute };

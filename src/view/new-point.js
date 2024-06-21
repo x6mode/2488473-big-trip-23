@@ -110,16 +110,16 @@ export default class NewRouteView extends AbstractView {
     return createNewCardTemplate();
   }
 
-  onKeydownClose = (evt) => {
+  documentKeydownHandler = (evt) => {
     if (isEscape(evt)) {
-      this.onClickClose();
+      this.resetBtnClickHandler();
     }
   };
 
-  onClickClose = () => {
+  resetBtnClickHandler = () => {
     document.querySelector('.trip-events__item-new').querySelector('.event__details').innerHTML = '';
     document.querySelector('.trip-events__item-new').remove();
-    document.removeEventListener('keydown', this.onKeydownClose);
+    document.removeEventListener('keydown', this.documentKeydownHandler);
     document.querySelector('.trip-main__event-add-btn').disabled = !document.querySelector('.trip-main__event-add-btn').disabled;
   };
 
@@ -136,10 +136,10 @@ export default class NewRouteView extends AbstractView {
     });
 
     document.querySelector('.trip-main__event-add-btn').disabled = !document.querySelector('.trip-main__event-add-btn').disabled;
-    document.addEventListener('keydown', this.onKeydownClose);
+    document.addEventListener('keydown', this.documentKeydownHandler);
     elem
       .querySelector('.event__reset-btn')
-      .addEventListener('click', this.onClickClose);
+      .addEventListener('click', this.resetBtnClickHandler);
 
     elemCostInput.value = '0';
 

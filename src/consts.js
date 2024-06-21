@@ -8,7 +8,7 @@ const TimeFormatView = {
 };
 const TimeFormatEdit = 'DD/MM/YY HH:mm';
 
-const ConnectionField = ['https://23.objects.htmlacademy.pro', 'Basic aesadffdasf6Hfwj73C'];
+const ConnectionField = ['https://23.objects.htmlacademy.pro', 'Basic afdasf6Hfwj73C'];
 
 const FilterFunc = {
   EVERYTHING: () => true,
