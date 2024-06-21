@@ -1,4 +1,4 @@
-import TopFrame from '../view/top-frame';
+import TopFrame from '../view/top-frame-view';
 import { render } from '../framework/render';
 import UiBlocker from '../framework/ui-blocker/ui-blocker';
 import FilterView from '../view/filter-view';
@@ -27,8 +27,6 @@ export default class HeadPresenter {
   #offersViewNR = null;
   #legendViewNR = null;
   #photoViewNR = null;
-
-  #routeInstance = [];
 
   #filterView = null;
 
